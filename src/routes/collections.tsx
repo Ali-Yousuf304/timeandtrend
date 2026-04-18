@@ -1,9 +1,11 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
-import { products, type Category, type Product, type Style } from "@/data/products";
+import { type Category, type Product, type Style } from "@/data/products";
+import { useProducts } from "@/hooks/use-products";
 import { ProductCard } from "@/components/site/ProductCard";
 import { ProductModal } from "@/components/site/ProductModal";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/collections")({
@@ -42,6 +44,7 @@ const styles: { value: "all" | Style; label: string }[] = [
 type Sort = "default" | "low-high" | "high-low";
 
 function CollectionsPage() {
+  const { products, loading } = useProducts();
   const [cat, setCat] = React.useState<"all" | Category>("all");
   const [style, setStyle] = React.useState<"all" | Style>("all");
   const [sort, setSort] = React.useState<Sort>("default");
@@ -54,7 +57,7 @@ function CollectionsPage() {
     if (sort === "low-high") list = [...list].sort((a, b) => a.price - b.price);
     if (sort === "high-low") list = [...list].sort((a, b) => b.price - a.price);
     return list;
-  }, [cat, style, sort]);
+  }, [products, cat, style, sort]);
 
   return (
     <section className="py-20">
@@ -65,11 +68,7 @@ function CollectionsPage() {
         <div className="mb-12 flex flex-wrap items-center justify-center gap-4">
           <FilterGroup>
             {categories.map((c) => (
-              <FilterBtn
-                key={c.value}
-                active={cat === c.value}
-                onClick={() => setCat(c.value)}
-              >
+              <FilterBtn key={c.value} active={cat === c.value} onClick={() => setCat(c.value)}>
                 {c.label}
               </FilterBtn>
             ))}
@@ -98,15 +97,18 @@ function CollectionsPage() {
           </select>
         </div>
 
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-[420px]" />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
           <p className="py-20 text-center text-muted-foreground">
             No watches match these filters.
           </p>
         ) : (
-          <motion.div
-            layout
-            className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-          >
+          <motion.div layout className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             <AnimatePresence mode="popLayout">
               {filtered.map((p) => (
                 <ProductCard key={p.id} product={p} onView={setModalProduct} />

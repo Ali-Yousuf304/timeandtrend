@@ -1,9 +1,11 @@
 import * as React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { products, type Category, type Product, type Style } from "@/data/products";
+import { type Category, type Product, type Style } from "@/data/products";
+import { useProducts } from "@/hooks/use-products";
 import { ProductCard } from "@/components/site/ProductCard";
 import { ProductModal } from "@/components/site/ProductModal";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 const categories: { value: "all" | Category; label: string }[] = [
@@ -23,6 +25,7 @@ const styles: { value: "all" | Style; label: string }[] = [
 const VISIBLE = 3;
 
 export function CollectionsPreview() {
+  const { products, loading } = useProducts();
   const [cat, setCat] = React.useState<"all" | Category>("all");
   const [style, setStyle] = React.useState<"all" | Style>("all");
   const [start, setStart] = React.useState(0);
@@ -45,7 +48,7 @@ export function CollectionsPreview() {
         (p) =>
           (cat === "all" || p.category === cat) && (style === "all" || p.style === style),
       ),
-    [cat, style],
+    [products, cat, style],
   );
 
   React.useEffect(() => {
@@ -66,11 +69,7 @@ export function CollectionsPreview() {
         <div className="mb-12 flex flex-wrap items-center justify-center gap-4">
           <FilterGroup>
             {categories.map((c) => (
-              <FilterBtn
-                key={c.value}
-                active={cat === c.value}
-                onClick={() => setCat(c.value)}
-              >
+              <FilterBtn key={c.value} active={cat === c.value} onClick={() => setCat(c.value)}>
                 {c.label}
               </FilterBtn>
             ))}
@@ -89,7 +88,13 @@ export function CollectionsPreview() {
           </FilterGroup>
         </div>
 
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-[420px]" />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
           <p className="py-20 text-center text-muted-foreground">
             No watches match these filters.
           </p>
