@@ -8,7 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useSiteSettings } from "@/hooks/use-settings";
+import { validatePromoCode, type ValidatedPromo } from "@/hooks/use-discounts";
 import { toast } from "sonner";
+import { Tag, X } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -27,6 +29,9 @@ function CheckoutPage() {
   const navigate = useNavigate();
   const [busy, setBusy] = React.useState(false);
   const [paymentMethod, setPaymentMethod] = React.useState<string>("");
+  const [promoInput, setPromoInput] = React.useState("");
+  const [promo, setPromo] = React.useState<ValidatedPromo | null>(null);
+  const [promoBusy, setPromoBusy] = React.useState(false);
   const [form, setForm] = React.useState({
     shipping_name: "",
     shipping_address_line1: "",
@@ -60,7 +65,34 @@ function CheckoutPage() {
     return settings.shipping_flat_rate;
   }, [settings, subtotal]);
 
-  const total = subtotal + shippingCost;
+  const total = Math.max(0, subtotal + shippingCost - (promo?.discountAmount ?? 0));
+
+  async function applyPromo() {
+    setPromoBusy(true);
+    const result = await validatePromoCode(promoInput, subtotal);
+    setPromoBusy(false);
+    if (!result.ok) {
+      toast.error(result.error);
+      setPromo(null);
+      return;
+    }
+    setPromo(result.promo);
+    toast.success(`Promo "${result.promo.code}" applied!`);
+  }
+
+  // Re-validate if subtotal changes below min order
+  React.useEffect(() => {
+    if (!promo) return;
+    validatePromoCode(promo.code, subtotal).then((r) => {
+      if (!r.ok) {
+        setPromo(null);
+        toast.error(`Promo removed: ${r.error}`);
+      } else {
+        setPromo(r.promo);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subtotal]);
 
   React.useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/auth" });
