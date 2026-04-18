@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { UserMenu } from "@/components/site/UserMenu";
+import { useSiteSettings } from "@/hooks/use-settings";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -19,6 +20,7 @@ const navLinks = [
 export function Header() {
   const { count, open } = useCart();
   const { ids } = useWishlist();
+  const { settings } = useSiteSettings();
   const wishCount = ids.size;
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -27,10 +29,21 @@ export function Header() {
       <nav className="mx-auto flex h-[70px] max-w-[1400px] items-center justify-between px-6 md:px-8">
         <Link
           to="/"
-          className="font-display text-2xl font-bold tracking-tight text-foreground"
+          className="flex items-center font-display text-2xl font-bold tracking-tight text-foreground"
           onClick={() => setMobileOpen(false)}
         >
-          Time <span className="text-[var(--gold)]">&amp;</span> Trend
+          {settings?.logo_url ? (
+            <img
+              src={settings.logo_url}
+              alt="Logo"
+              className="h-10 max-w-[180px] object-contain"
+            />
+          ) : (
+            <>
+              Time <span className="ml-1 text-[var(--gold)]">&amp;</span>
+              <span className="ml-1">Trend</span>
+            </>
+          )}
         </Link>
 
         <ul className="hidden items-center gap-8 lg:flex">

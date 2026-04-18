@@ -41,24 +41,24 @@ const features = [
 
 function AboutPage() {
   return (
-    <section className="bg-[var(--ink)] py-20 text-[var(--ink-foreground)]">
+    <section className="bg-white py-20 text-foreground">
       <div className="mx-auto grid max-w-[1200px] gap-12 px-6 md:grid-cols-2 md:px-8 md:gap-16">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
         >
-          <h1 className="font-display text-4xl md:text-5xl">
+          <h1 className="font-display text-4xl text-foreground md:text-5xl">
             Luxury on Your Wrist,{" "}
             <span className="italic text-[var(--gold)]">Every Day.</span>
           </h1>
           <div className="mt-4 h-[3px] w-16 bg-[var(--gold)]" />
-          <p className="mt-8 text-white/70">
+          <p className="mt-8 text-muted-foreground">
             Time & Trend was founded on the belief that a beautiful timepiece is more than just
             an accessory—it's a statement. We are dedicated to curating and crafting watches of
             exceptional quality and timeless design.
           </p>
-          <p className="mt-4 text-white/70">
+          <p className="mt-4 text-muted-foreground">
             Every piece we offer is a testament to both innovation and tradition, made for those
             who measure life not in minutes, but in moments worth remembering.
           </p>
@@ -72,14 +72,14 @@ function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className="flex gap-4 rounded-xl border border-white/10 bg-white/5 p-6"
+              className="flex gap-4 rounded-xl border border-border bg-card p-6"
             >
               <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-[var(--gold)]/15 text-[var(--gold)]">
                 <f.icon className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="font-display text-xl font-semibold text-white">{f.title}</h3>
-                <p className="mt-1 text-sm text-white/70">{f.desc}</p>
+                <h3 className="font-display text-xl font-semibold text-foreground">{f.title}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{f.desc}</p>
               </div>
             </motion.div>
           ))}
