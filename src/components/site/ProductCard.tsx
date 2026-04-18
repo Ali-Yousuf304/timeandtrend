@@ -1,7 +1,10 @@
 import { motion } from "framer-motion";
+import { Heart } from "lucide-react";
 import type { Product } from "@/data/products";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface Props {
   product: Product;
@@ -10,6 +13,8 @@ interface Props {
 
 export function ProductCard({ product, onView }: Props) {
   const { add } = useCart();
+  const { has, toggle } = useWishlist();
+  const wished = has(product.id);
 
   return (
     <motion.div
@@ -39,6 +44,22 @@ export function ProductCard({ product, onView }: Props) {
             ))}
           </div>
         )}
+        <button
+          type="button"
+          aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
+          onClick={(e) => {
+            e.stopPropagation();
+            toggle(product.id);
+          }}
+          className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-background/90 shadow-sm backdrop-blur transition-colors hover:bg-background"
+        >
+          <Heart
+            className={cn(
+              "h-4 w-4 transition-colors",
+              wished ? "fill-[var(--gold)] text-[var(--gold)]" : "text-foreground/70",
+            )}
+          />
+        </button>
         <img
           src={product.image}
           alt={product.name}

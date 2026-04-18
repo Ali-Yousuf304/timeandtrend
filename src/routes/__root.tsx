@@ -5,6 +5,8 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartProvider } from "@/context/CartContext";
 import { CartPanel } from "@/components/site/CartPanel";
+import { AuthProvider } from "@/context/AuthContext";
+import { WishlistProvider } from "@/context/WishlistContext";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -80,16 +82,20 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   return (
-    <CartProvider>
-      <div className="flex min-h-screen flex-col">
-        <Header />
-        <main className="flex-1">
-          <Outlet />
-        </main>
-        <Footer />
-        <CartPanel />
-        <Toaster />
-      </div>
-    </CartProvider>
+    <AuthProvider>
+      <WishlistProvider>
+        <CartProvider>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">
+              <Outlet />
+            </main>
+            <Footer />
+            <CartPanel />
+            <Toaster />
+          </div>
+        </CartProvider>
+      </WishlistProvider>
+    </AuthProvider>
   );
 }
