@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Package } from "lucide-react";
+import { Package, Star, Trash2 } from "lucide-react";
+import { useUserReviews } from "@/hooks/use-reviews";
 
 export const Route = createFileRoute("/account")({
   head: () => ({
@@ -104,11 +105,14 @@ function AccountPage() {
       <h1 className="font-display text-4xl font-bold">My Account</h1>
       <p className="mt-1 text-sm text-muted-foreground">{profile.email}</p>
 
+      <UserReviewsSection userId={user.id} />
+
       <Tabs defaultValue="profile" className="mt-8">
         <TabsList>
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="address">Address</TabsTrigger>
           <TabsTrigger value="orders">Orders</TabsTrigger>
+          <TabsTrigger value="reviews">My Reviews</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile">
