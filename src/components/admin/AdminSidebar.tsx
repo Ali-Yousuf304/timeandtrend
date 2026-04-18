@@ -10,13 +10,20 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const items = [
+interface NavItem {
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  exact?: boolean;
+}
+
+const items: NavItem[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { to: "/admin/collections", label: "Collections", icon: LayoutList },
   { to: "/admin/banners", label: "Banner", icon: ImageIcon },
-] as const;
+];
 
 export function AdminSidebar() {
   const { pathname } = useLocation();
