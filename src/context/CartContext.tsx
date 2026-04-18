@@ -21,9 +21,30 @@ interface CartContextValue {
 
 const CartContext = React.createContext<CartContextValue | null>(null);
 
+const STORAGE_KEY = "tt_cart_items_v1";
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = React.useState<CartItem[]>([]);
+  const [items, setItems] = React.useState<CartItem[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? (parsed as CartItem[]) : [];
+    } catch {
+      return [];
+    }
+  });
   const [isOpen, setIsOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch {
+      // ignore quota errors
+    }
+  }, [items]);
 
   const add = React.useCallback((product: Product) => {
     setItems((prev) => {
