@@ -251,6 +251,73 @@ export function SettingsAdmin() {
             </Button>
           </div>
         </TabsContent>
+
+        <TabsContent value="logo" className="space-y-3">
+          <div className="space-y-4 rounded-lg border border-border bg-card p-5">
+            <h3 className="font-semibold">Website logo</h3>
+            <p className="text-xs text-muted-foreground">
+              Upload an image to replace the text logo in the header and footer.
+              Transparent PNGs work best. Recommended height: 40-60px.
+            </p>
+
+            {logoUrl && (
+              <div className="flex items-center gap-4 rounded-md border border-border bg-muted/30 p-4">
+                <img
+                  src={logoUrl}
+                  alt="Current logo"
+                  className="h-12 max-w-[180px] object-contain"
+                />
+                <div className="flex-1 break-all text-xs text-muted-foreground">
+                  {logoUrl}
+                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setLogoUrl("")}
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+
+            <div>
+              <Label htmlFor="logo-upload" className="text-sm">Upload logo image</Label>
+              <div className="mt-1 flex items-center gap-3">
+                <Input
+                  id="logo-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  disabled={uploading}
+                />
+                {uploading && (
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Upload className="h-3.5 w-3.5 animate-pulse" /> Uploading…
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="logo-url" className="text-sm">Or paste an image URL</Label>
+              <Input
+                id="logo-url"
+                value={logoUrl}
+                onChange={(e) => setLogoUrl(e.target.value)}
+                placeholder="https://..."
+              />
+            </div>
+
+            <Button
+              onClick={saveLogo}
+              disabled={saving}
+              className="bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"
+            >
+              {saving ? "Saving…" : "Save logo"}
+            </Button>
+          </div>
+        </TabsContent>
       </Tabs>
     </div>
   );
