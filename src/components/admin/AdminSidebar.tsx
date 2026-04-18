@@ -8,6 +8,7 @@ import {
   ImageIcon,
   Users,
   Settings,
+  Star,
   ArrowLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ const items: NavItem[] = [
   { to: "/admin/customers", label: "Customers", icon: Users },
   { to: "/admin/collections", label: "Collections", icon: LayoutList },
   { to: "/admin/banners", label: "Banner", icon: ImageIcon },
+  { to: "/admin/reviews", label: "Manage Reviews", icon: Star },
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
