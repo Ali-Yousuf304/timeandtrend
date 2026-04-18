@@ -125,6 +125,11 @@ function HomePage() {
         </div>
       </section>
 
+      {/* Collections (filterable carousel) */}
+      <section className="bg-secondary/40">
+        <CollectionsPreview />
+      </section>
+
       {/* Best Sellers preview */}
       <section className="bg-secondary py-20">
         <div className="mx-auto max-w-[1200px] px-6 md:px-8">
