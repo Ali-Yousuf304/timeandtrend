@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      banners: {
+        Row: {
+          active: boolean
+          created_at: string
+          cta_label: string | null
+          cta_link: string | null
+          eyebrow: string | null
+          id: string
+          image: string
+          sort_order: number
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          cta_label?: string | null
+          cta_link?: string | null
+          eyebrow?: string | null
+          id?: string
+          image: string
+          sort_order?: number
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          cta_label?: string | null
+          cta_link?: string | null
+          eyebrow?: string | null
+          id?: string
+          image?: string
+          sort_order?: number
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
