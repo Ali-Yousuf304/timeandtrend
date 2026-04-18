@@ -57,6 +57,11 @@ export function UserMenu() {
             <Heart className="h-4 w-4" /> Wishlist
           </Link>
         </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/account" search={{ tab: "reviews" }}>
+            <Star className="h-4 w-4" /> My Reviews
+          </Link>
+        </DropdownMenuItem>
         {isAdmin && (
           <>
             <DropdownMenuSeparator />
