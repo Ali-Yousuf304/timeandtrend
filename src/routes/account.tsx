@@ -105,8 +105,6 @@ function AccountPage() {
       <h1 className="font-display text-4xl font-bold">My Account</h1>
       <p className="mt-1 text-sm text-muted-foreground">{profile.email}</p>
 
-      <UserReviewsSection userId={user.id} />
-
       <Tabs defaultValue="profile" className="mt-8">
         <TabsList>
           <TabsTrigger value="profile">Profile</TabsTrigger>
