@@ -71,7 +71,7 @@ export function CartPanel() {
                           </button>
                         </div>
                         <p className="text-sm font-bold text-[var(--gold)]">
-                          ${product.price.toLocaleString()}
+                          Rs. {product.price.toLocaleString()}
                         </p>
                         <div className="mt-auto flex items-center gap-2">
                           <button
@@ -100,7 +100,7 @@ export function CartPanel() {
             <div className="border-t border-border px-6 py-4">
               <div className="mb-4 flex justify-between text-sm font-semibold">
                 <span>Subtotal</span>
-                <span>${subtotal.toLocaleString()}</span>
+                <span>Rs. {subtotal.toLocaleString()}</span>
               </div>
               <Button
                 className="w-full bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"

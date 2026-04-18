@@ -62,7 +62,7 @@ function WishlistPage() {
                 <h3 className="font-display text-lg font-semibold">{p.name}</h3>
                 <p className="text-sm text-muted-foreground">{p.tagline}</p>
                 <p className="mt-2 text-lg font-bold text-[var(--gold)]">
-                  ${p.price.toLocaleString()}
+                  Rs. {p.price.toLocaleString()}
                 </p>
               </div>
               <div className="mt-4 flex gap-2">

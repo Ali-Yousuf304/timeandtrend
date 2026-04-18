@@ -202,7 +202,7 @@ function CheckoutPage() {
           disabled={busy || enabledMethods.length === 0}
           className="w-full bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"
         >
-          {busy ? "Placing…" : `Place order — $${total.toLocaleString()}`}
+          {busy ? "Placing…" : `Place order — Rs. ${total.toLocaleString()}`}
         </Button>
       </form>
 
@@ -214,19 +214,19 @@ function CheckoutPage() {
               <span>
                 {i.product.name} × {i.quantity}
               </span>
-              <span>${(i.product.price * i.quantity).toLocaleString()}</span>
+              <span>Rs. {(i.product.price * i.quantity).toLocaleString()}</span>
             </li>
           ))}
         </ul>
         <div className="mt-4 space-y-2 border-t border-border pt-4 text-sm">
           <div className="flex justify-between text-muted-foreground">
             <span>Subtotal</span>
-            <span>${subtotal.toLocaleString()}</span>
+            <span>Rs. {subtotal.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-muted-foreground">
             <span>Shipping</span>
             <span>
-              {shippingCost === 0 ? "Free" : `$${shippingCost.toLocaleString()}`}
+              {shippingCost === 0 ? "Free" : `Rs. ${shippingCost.toLocaleString()}`}
             </span>
           </div>
           {settings?.shipping_note && (
@@ -234,7 +234,7 @@ function CheckoutPage() {
           )}
           <div className="flex justify-between border-t border-border pt-2 text-base font-semibold">
             <span>Total</span>
-            <span className="text-[var(--gold)]">${total.toLocaleString()}</span>
+            <span className="text-[var(--gold)]">Rs. {total.toLocaleString()}</span>
           </div>
         </div>
       </aside>

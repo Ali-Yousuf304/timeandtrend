@@ -254,7 +254,7 @@ export function ProductsAdmin() {
             <div className="flex-1">
               <p className="font-semibold">{p.name}</p>
               <p className="text-xs text-muted-foreground">
-                {p.category} · {p.style} · ${Number(p.price).toLocaleString()}
+                {p.category} · {p.style} · Rs. {Number(p.price).toLocaleString()}
               </p>
             </div>
             <Button variant="ghost" size="icon" onClick={() => setEditing(p)}>

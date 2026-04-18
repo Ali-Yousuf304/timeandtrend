@@ -204,7 +204,7 @@ export function SettingsAdmin() {
             <h3 className="font-semibold">Delivery charges</h3>
             <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <Label htmlFor="flat">Flat shipping rate ($)</Label>
+                <Label htmlFor="flat">Flat shipping rate (Rs.)</Label>
                 <Input
                   id="flat"
                   type="number"
@@ -218,7 +218,7 @@ export function SettingsAdmin() {
                 </p>
               </div>
               <div>
-                <Label htmlFor="free">Free shipping over ($)</Label>
+                <Label htmlFor="free">Free shipping over (Rs.)</Label>
                 <Input
                   id="free"
                   type="number"

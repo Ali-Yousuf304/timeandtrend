@@ -69,7 +69,7 @@ function BestSellersPage() {
                   <h2 className="mt-1 font-display text-xl font-semibold">{p.name}</h2>
                   <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>
                   <p className="mt-3 font-bold text-[var(--gold)]">
-                    ${p.price.toLocaleString()}
+                    Rs. {p.price.toLocaleString()}
                   </p>
                 </div>
               </motion.article>

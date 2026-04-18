@@ -188,7 +188,7 @@ function HomePage() {
                     <h3 className="mt-1 font-display text-lg font-semibold">{p.name}</h3>
                     <p className="text-sm text-muted-foreground">{p.tagline}</p>
                     <p className="mt-2 font-bold text-[var(--gold)]">
-                      ${p.price.toLocaleString()}
+                      Rs. {p.price.toLocaleString()}
                     </p>
                   </div>
                 </motion.div>
