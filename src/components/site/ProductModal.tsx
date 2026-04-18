@@ -3,6 +3,9 @@ import { X } from "lucide-react";
 import type { Product } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
+import { ReviewForm } from "@/components/site/ReviewForm";
+import { ReviewList } from "@/components/site/ReviewList";
+import { useProductReviews } from "@/hooks/use-reviews";
 
 interface Props {
   product: Product | null;
@@ -11,6 +14,7 @@ interface Props {
 
 export function ProductModal({ product, onClose }: Props) {
   const { add } = useCart();
+  const { reviews, loading, reload } = useProductReviews(product?.id);
 
   return (
     <AnimatePresence>
@@ -27,13 +31,14 @@ export function ProductModal({ product, onClose }: Props) {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="relative w-full max-w-3xl overflow-hidden rounded-xl bg-background shadow-2xl"
+            className="relative max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-background shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={onClose}
               aria-label="Close"
-              className="absolute right-4 top-4 z-10 rounded-full bg-background/90 p-2 transition-colors hover:bg-muted"
+              className="sticky right-4 top-4 z-10 ml-auto mr-4 mt-4 block rounded-full bg-background/90 p-2 transition-colors hover:bg-muted"
+              style={{ float: "right" }}
             >
               <X className="h-5 w-5" />
             </button>
@@ -69,6 +74,28 @@ export function ProductModal({ product, onClose }: Props) {
                 >
                   Add to Cart
                 </Button>
+              </div>
+            </div>
+
+            <div className="border-t border-border p-8">
+              <h3 className="font-display text-xl font-semibold">
+                Customer Reviews
+                {reviews.length > 0 && (
+                  <span className="ml-2 text-sm font-normal text-muted-foreground">
+                    ({reviews.length})
+                  </span>
+                )}
+              </h3>
+              <div className="mt-4 space-y-4">
+                <ReviewList
+                  reviews={reviews}
+                  loading={loading}
+                  empty="No reviews yet. Be the first to review!"
+                />
+                <div>
+                  <h4 className="mb-2 text-sm font-semibold">Write a review</h4>
+                  <ReviewForm productId={product.id} onSubmitted={reload} />
+                </div>
               </div>
             </div>
           </motion.div>

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Plus, Trash2, CreditCard, Truck } from "lucide-react";
+import { Plus, Trash2, CreditCard, Truck, ImageIcon, Upload } from "lucide-react";
 import { useSiteSettings, type PaymentMethod } from "@/hooks/use-settings";
 
 export function SettingsAdmin() {
@@ -16,6 +16,8 @@ export function SettingsAdmin() {
   const [flatRate, setFlatRate] = React.useState("");
   const [freeThreshold, setFreeThreshold] = React.useState("");
   const [note, setNote] = React.useState("");
+  const [logoUrl, setLogoUrl] = React.useState("");
+  const [uploading, setUploading] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
 
   React.useEffect(() => {
@@ -24,8 +26,44 @@ export function SettingsAdmin() {
       setFlatRate(String(settings.shipping_flat_rate));
       setFreeThreshold(String(settings.shipping_free_threshold));
       setNote(settings.shipping_note ?? "");
+      setLogoUrl(settings.logo_url ?? "");
     }
   }, [settings]);
+
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !settings) return;
+    setUploading(true);
+    const ext = file.name.split(".").pop() ?? "png";
+    const path = `logo-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage
+      .from("site-assets")
+      .upload(path, file, { upsert: true, cacheControl: "3600" });
+    if (upErr) {
+      setUploading(false);
+      toast.error(upErr.message);
+      return;
+    }
+    const { data } = supabase.storage.from("site-assets").getPublicUrl(path);
+    setLogoUrl(data.publicUrl);
+    setUploading(false);
+    toast.success("Logo uploaded — click Save to apply");
+  }
+
+  async function saveLogo() {
+    if (!settings) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from("site_settings")
+      .update({ logo_url: logoUrl || null })
+      .eq("id", settings.id);
+    setSaving(false);
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Logo updated");
+      reload();
+    }
+  }
 
   async function savePayment() {
     if (!settings) return;
@@ -92,6 +130,9 @@ export function SettingsAdmin() {
           </TabsTrigger>
           <TabsTrigger value="shipping">
             <Truck className="mr-1.5 h-4 w-4" /> Shipping
+          </TabsTrigger>
+          <TabsTrigger value="logo">
+            <ImageIcon className="mr-1.5 h-4 w-4" /> Logo
           </TabsTrigger>
         </TabsList>
 
@@ -207,6 +248,73 @@ export function SettingsAdmin() {
               className="bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"
             >
               {saving ? "Saving…" : "Save shipping settings"}
+            </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="logo" className="space-y-3">
+          <div className="space-y-4 rounded-lg border border-border bg-card p-5">
+            <h3 className="font-semibold">Website logo</h3>
+            <p className="text-xs text-muted-foreground">
+              Upload an image to replace the text logo in the header and footer.
+              Transparent PNGs work best. Recommended height: 40-60px.
+            </p>
+
+            {logoUrl && (
+              <div className="flex items-center gap-4 rounded-md border border-border bg-muted/30 p-4">
+                <img
+                  src={logoUrl}
+                  alt="Current logo"
+                  className="h-12 max-w-[180px] object-contain"
+                />
+                <div className="flex-1 break-all text-xs text-muted-foreground">
+                  {logoUrl}
+                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setLogoUrl("")}
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+
+            <div>
+              <Label htmlFor="logo-upload" className="text-sm">Upload logo image</Label>
+              <div className="mt-1 flex items-center gap-3">
+                <Input
+                  id="logo-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  disabled={uploading}
+                />
+                {uploading && (
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Upload className="h-3.5 w-3.5 animate-pulse" /> Uploading…
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="logo-url" className="text-sm">Or paste an image URL</Label>
+              <Input
+                id="logo-url"
+                value={logoUrl}
+                onChange={(e) => setLogoUrl(e.target.value)}
+                placeholder="https://..."
+              />
+            </div>
+
+            <Button
+              onClick={saveLogo}
+              disabled={saving}
+              className="bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"
+            >
+              {saving ? "Saving…" : "Save logo"}
             </Button>
           </div>
         </TabsContent>

@@ -13,6 +13,7 @@ export interface SiteSettings {
   shipping_flat_rate: number;
   shipping_free_threshold: number;
   shipping_note: string | null;
+  logo_url: string | null;
 }
 
 export function useSiteSettings() {
@@ -34,6 +35,7 @@ export function useSiteSettings() {
         shipping_flat_rate: Number(data.shipping_flat_rate),
         shipping_free_threshold: Number(data.shipping_free_threshold),
         shipping_note: data.shipping_note,
+        logo_url: (data as { logo_url?: string | null }).logo_url ?? null,
       });
     }
     setLoading(false);
