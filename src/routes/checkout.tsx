@@ -8,7 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useSiteSettings } from "@/hooks/use-settings";
+import { validatePromoCode, type ValidatedPromo } from "@/hooks/use-discounts";
 import { toast } from "sonner";
+import { Tag, X } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -27,6 +29,9 @@ function CheckoutPage() {
   const navigate = useNavigate();
   const [busy, setBusy] = React.useState(false);
   const [paymentMethod, setPaymentMethod] = React.useState<string>("");
+  const [promoInput, setPromoInput] = React.useState("");
+  const [promo, setPromo] = React.useState<ValidatedPromo | null>(null);
+  const [promoBusy, setPromoBusy] = React.useState(false);
   const [form, setForm] = React.useState({
     shipping_name: "",
     shipping_address_line1: "",
@@ -60,7 +65,34 @@ function CheckoutPage() {
     return settings.shipping_flat_rate;
   }, [settings, subtotal]);
 
-  const total = subtotal + shippingCost;
+  const total = Math.max(0, subtotal + shippingCost - (promo?.discountAmount ?? 0));
+
+  async function applyPromo() {
+    setPromoBusy(true);
+    const result = await validatePromoCode(promoInput, subtotal);
+    setPromoBusy(false);
+    if (!result.ok) {
+      toast.error(result.error);
+      setPromo(null);
+      return;
+    }
+    setPromo(result.promo);
+    toast.success(`Promo "${result.promo.code}" applied!`);
+  }
+
+  // Re-validate if subtotal changes below min order
+  React.useEffect(() => {
+    if (!promo) return;
+    validatePromoCode(promo.code, subtotal).then((r) => {
+      if (!r.ok) {
+        setPromo(null);
+        toast.error(`Promo removed: ${r.error}`);
+      } else {
+        setPromo(r.promo);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subtotal]);
 
   React.useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/auth" });
@@ -104,6 +136,8 @@ function CheckoutPage() {
         user_id: user.id,
         subtotal,
         total,
+        promo_code: promo?.code ?? null,
+        discount_amount: promo?.discountAmount ?? 0,
         ...form,
       })
       .select("id")
@@ -129,6 +163,10 @@ function CheckoutPage() {
       toast.error(itemsError.message);
       setBusy(false);
       return;
+    }
+
+    if (promo) {
+      await supabase.rpc("increment_discount_usage", { _code: promo.code });
     }
 
     items.forEach((i) => remove(i.product.id));
@@ -197,6 +235,59 @@ function CheckoutPage() {
           )}
         </div>
 
+        <div className="space-y-3 rounded-lg border border-border bg-card p-6">
+          <h2 className="font-display text-lg font-semibold">Promo code (optional)</h2>
+          {promo ? (
+            <div className="flex items-center justify-between rounded-md border border-[var(--gold)]/40 bg-[var(--gold)]/10 p-3">
+              <div className="flex items-center gap-2">
+                <Tag className="h-4 w-4 text-[var(--gold)]" />
+                <div>
+                  <p className="font-mono text-sm font-bold text-[var(--gold)]">{promo.code}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {promo.type === "percentage"
+                      ? `${promo.value}% off`
+                      : `Rs. ${promo.value.toLocaleString()} off`}{" "}
+                    — saved Rs. {promo.discountAmount.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setPromo(null);
+                  setPromoInput("");
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <Input
+                placeholder="Enter promo code"
+                value={promoInput}
+                onChange={(e) => setPromoInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    applyPromo();
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                onClick={applyPromo}
+                disabled={promoBusy || !promoInput.trim()}
+                variant="outline"
+              >
+                {promoBusy ? "…" : "Apply"}
+              </Button>
+            </div>
+          )}
+        </div>
+
         <Button
           type="submit"
           disabled={busy || enabledMethods.length === 0}
@@ -229,6 +320,12 @@ function CheckoutPage() {
               {shippingCost === 0 ? "Free" : `Rs. ${shippingCost.toLocaleString()}`}
             </span>
           </div>
+          {promo && (
+            <div className="flex justify-between text-[var(--gold)]">
+              <span>Discount ({promo.code})</span>
+              <span>− Rs. {promo.discountAmount.toLocaleString()}</span>
+            </div>
+          )}
           {settings?.shipping_note && (
             <p className="text-xs text-muted-foreground">{settings.shipping_note}</p>
           )}

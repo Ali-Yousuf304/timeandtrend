@@ -111,7 +111,7 @@ function CollectionsPage() {
           <motion.div layout className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             <AnimatePresence mode="popLayout">
               {filtered.map((p) => (
-                <ProductCard key={p.id} product={p} onView={setModalProduct} />
+                <ProductCard key={p.id} product={p} onQuickView={setModalProduct} />
               ))}
             </AnimatePresence>
           </motion.div>
