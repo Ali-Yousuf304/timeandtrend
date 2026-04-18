@@ -44,7 +44,7 @@ export function AdminSidebar() {
           return (
             <Link
               key={item.to}
-              to={item.to}
+              to={item.to as "/admin"}
               className={cn(
                 "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                 active
@@ -81,7 +81,7 @@ export function AdminMobileNav() {
         return (
           <Link
             key={item.to}
-            to={item.to}
+            to={item.to as "/admin"}
             className={cn(
               "flex shrink-0 items-center gap-2 rounded-md px-3 py-1.5 text-xs font-medium",
               active
