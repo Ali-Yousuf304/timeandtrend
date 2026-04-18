@@ -4,6 +4,7 @@ import { ArrowRight, ShieldCheck, Sparkles, Truck } from "lucide-react";
 import heroWatch from "@/assets/hero-watch.jpg";
 import { products, bestSellers } from "@/data/products";
 import { ProductCard } from "@/components/site/ProductCard";
+import { CollectionsPreview } from "@/components/site/CollectionsPreview";
 
 export const Route = createFileRoute("/")({
   head: () => ({
