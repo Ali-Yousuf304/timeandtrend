@@ -247,6 +247,36 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          created_at: string
+          id: string
+          payment_methods: Json
+          shipping_flat_rate: number
+          shipping_free_threshold: number
+          shipping_note: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payment_methods?: Json
+          shipping_flat_rate?: number
+          shipping_free_threshold?: number
+          shipping_note?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payment_methods?: Json
+          shipping_flat_rate?: number
+          shipping_free_threshold?: number
+          shipping_note?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
