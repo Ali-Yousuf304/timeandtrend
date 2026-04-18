@@ -4,7 +4,7 @@ import { Heart, Trash2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
-import { products } from "@/data/products";
+import { useProducts } from "@/hooks/use-products";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/wishlist")({
@@ -21,16 +21,14 @@ function WishlistPage() {
   const { user, loading: authLoading } = useAuth();
   const { ids, toggle, loading } = useWishlist();
   const { add } = useCart();
+  const { products } = useProducts();
   const navigate = useNavigate();
 
   React.useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/auth" });
   }, [user, authLoading, navigate]);
 
-  const items = React.useMemo(
-    () => products.filter((p) => ids.has(p.id)),
-    [ids],
-  );
+  const items = React.useMemo(() => products.filter((p) => ids.has(p.id)), [products, ids]);
 
   return (
     <div className="mx-auto max-w-[1200px] px-6 py-16 md:px-8">
@@ -58,11 +56,7 @@ function WishlistPage() {
               className="overflow-hidden rounded-lg border border-border bg-card p-4 shadow-sm"
             >
               <div className="aspect-square overflow-hidden rounded bg-muted p-4">
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  className="h-full w-full object-contain"
-                />
+                <img src={p.image} alt={p.name} className="h-full w-full object-contain" />
               </div>
               <div className="mt-4 text-center">
                 <h3 className="font-display text-lg font-semibold">{p.name}</h3>
