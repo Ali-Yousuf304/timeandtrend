@@ -264,7 +264,98 @@ function AccountPage() {
             </div>
           )}
         </TabsContent>
+
+        <TabsContent value="reviews">
+          <UserReviewsTab userId={user.id} />
+        </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+function UserReviewsTab({ userId }: { userId: string }) {
+  const { reviews, loading, reload } = useUserReviews(userId);
+
+  async function remove(id: string) {
+    if (!confirm("Delete this review?")) return;
+    const { error } = await supabase.from("reviews").delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Review deleted");
+      reload();
+    }
+  }
+
+  if (loading) {
+    return <p className="mt-6 text-sm text-muted-foreground">Loading reviews…</p>;
+  }
+  if (reviews.length === 0) {
+    return (
+      <div className="mt-6 rounded-lg border border-border bg-card p-12 text-center">
+        <Star className="mx-auto h-10 w-10 text-muted-foreground" />
+        <p className="mt-3 text-muted-foreground">
+          You haven't reviewed any products yet.
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div className="mt-6 space-y-3">
+      {reviews.map((r) => (
+        <div
+          key={r.id}
+          className="rounded-lg border border-border bg-card p-4 shadow-sm"
+        >
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="flex gap-3">
+              {r.product_image && (
+                <img
+                  src={r.product_image}
+                  alt={r.product_name ?? ""}
+                  className="h-14 w-14 shrink-0 rounded object-cover"
+                />
+              )}
+              <div>
+                <p className="text-xs text-muted-foreground">
+                  {r.product_name ?? "Product"}
+                </p>
+                <div className="mt-1 flex items-center gap-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`h-3.5 w-3.5 ${
+                        i < r.rating
+                          ? "fill-[var(--gold)] text-[var(--gold)]"
+                          : "text-muted-foreground"
+                      }`}
+                    />
+                  ))}
+                </div>
+                {r.title && (
+                  <p className="mt-2 text-sm font-semibold">{r.title}</p>
+                )}
+                <p className="mt-1 text-sm text-muted-foreground">{r.body}</p>
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  {new Date(r.created_at).toLocaleDateString()}{" "}
+                  {!r.enabled && (
+                    <span className="ml-2 rounded bg-destructive/15 px-2 py-0.5 text-destructive">
+                      Hidden by admin
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => remove(r.id)}
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+            >
+              <Trash2 className="mr-1 h-4 w-4" /> Delete
+            </Button>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
