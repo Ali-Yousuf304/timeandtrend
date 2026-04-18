@@ -235,6 +235,59 @@ function CheckoutPage() {
           )}
         </div>
 
+        <div className="space-y-3 rounded-lg border border-border bg-card p-6">
+          <h2 className="font-display text-lg font-semibold">Promo code (optional)</h2>
+          {promo ? (
+            <div className="flex items-center justify-between rounded-md border border-[var(--gold)]/40 bg-[var(--gold)]/10 p-3">
+              <div className="flex items-center gap-2">
+                <Tag className="h-4 w-4 text-[var(--gold)]" />
+                <div>
+                  <p className="font-mono text-sm font-bold text-[var(--gold)]">{promo.code}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {promo.type === "percentage"
+                      ? `${promo.value}% off`
+                      : `Rs. ${promo.value.toLocaleString()} off`}{" "}
+                    — saved Rs. {promo.discountAmount.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setPromo(null);
+                  setPromoInput("");
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <Input
+                placeholder="Enter promo code"
+                value={promoInput}
+                onChange={(e) => setPromoInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    applyPromo();
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                onClick={applyPromo}
+                disabled={promoBusy || !promoInput.trim()}
+                variant="outline"
+              >
+                {promoBusy ? "…" : "Apply"}
+              </Button>
+            </div>
+          )}
+        </div>
+
         <Button
           type="submit"
           disabled={busy || enabledMethods.length === 0}
@@ -267,6 +320,12 @@ function CheckoutPage() {
               {shippingCost === 0 ? "Free" : `Rs. ${shippingCost.toLocaleString()}`}
             </span>
           </div>
+          {promo && (
+            <div className="flex justify-between text-[var(--gold)]">
+              <span>Discount ({promo.code})</span>
+              <span>− Rs. {promo.discountAmount.toLocaleString()}</span>
+            </div>
+          )}
           {settings?.shipping_note && (
             <p className="text-xs text-muted-foreground">{settings.shipping_note}</p>
           )}
