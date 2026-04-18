@@ -18,9 +18,23 @@ export function ReviewForm({ productId, onSubmitted }: Props) {
   const { user } = useAuth();
   const [rating, setRating] = React.useState(5);
   const [hover, setHover] = React.useState(0);
+  const [name, setName] = React.useState("");
   const [title, setTitle] = React.useState("");
   const [body, setBody] = React.useState("");
   const [submitting, setSubmitting] = React.useState(false);
+
+  // Prefill name from profile
+  React.useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.display_name) setName(data.display_name);
+      });
+  }, [user]);
 
   if (!user) {
     return (
@@ -35,11 +49,22 @@ export function ReviewForm({ productId, onSubmitted }: Props) {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!name.trim()) {
+      toast.error("Please enter your name");
+      return;
+    }
     if (!body.trim()) {
       toast.error("Please write a review");
       return;
     }
     setSubmitting(true);
+
+    // Save the name to the user's profile so admin sees the reviewer name
+    await supabase
+      .from("profiles")
+      .update({ display_name: name.trim() })
+      .eq("id", user!.id);
+
     const { error } = await supabase.from("reviews").upsert(
       {
         user_id: user!.id,
@@ -87,6 +112,17 @@ export function ReviewForm({ productId, onSubmitted }: Props) {
             </button>
           ))}
         </div>
+      </div>
+      <div>
+        <Label htmlFor="rev-name" className="text-xs">Your name</Label>
+        <Input
+          id="rev-name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="John Doe"
+          required
+          maxLength={80}
+        />
       </div>
       <div>
         <Label htmlFor="rev-title" className="text-xs">Title (optional)</Label>
