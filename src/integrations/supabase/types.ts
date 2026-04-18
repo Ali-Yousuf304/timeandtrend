@@ -56,6 +56,48 @@ export type Database = {
         }
         Relationships: []
       }
+      discounts: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          min_order_amount: number
+          updated_at: string
+          usage_count: number
+          usage_limit: number | null
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          discount_type: string
+          discount_value: number
+          expires_at?: string | null
+          id?: string
+          min_order_amount?: number
+          updated_at?: string
+          usage_count?: number
+          usage_limit?: number | null
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          min_order_amount?: number
+          updated_at?: string
+          usage_count?: number
+          usage_limit?: number | null
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
@@ -100,7 +142,9 @@ export type Database = {
       orders: {
         Row: {
           created_at: string
+          discount_amount: number
           id: string
+          promo_code: string | null
           shipping_address_line1: string | null
           shipping_address_line2: string | null
           shipping_city: string | null
@@ -117,7 +161,9 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          discount_amount?: number
           id?: string
+          promo_code?: string | null
           shipping_address_line1?: string | null
           shipping_address_line2?: string | null
           shipping_city?: string | null
@@ -134,7 +180,9 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          discount_amount?: number
           id?: string
+          promo_code?: string | null
           shipping_address_line1?: string | null
           shipping_address_line2?: string | null
           shipping_city?: string | null
@@ -378,6 +426,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_discount_usage: { Args: { _code: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"
