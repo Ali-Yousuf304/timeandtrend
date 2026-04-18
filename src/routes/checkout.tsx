@@ -136,6 +136,8 @@ function CheckoutPage() {
         user_id: user.id,
         subtotal,
         total,
+        promo_code: promo?.code ?? null,
+        discount_amount: promo?.discountAmount ?? 0,
         ...form,
       })
       .select("id")
