@@ -165,6 +165,10 @@ function CheckoutPage() {
       return;
     }
 
+    if (promo) {
+      await supabase.rpc("increment_discount_usage", { _code: promo.code });
+    }
+
     items.forEach((i) => remove(i.product.id));
     toast.success("Order placed!");
     navigate({ to: "/account" });
