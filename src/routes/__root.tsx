@@ -5,6 +5,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartProvider } from "@/context/CartContext";
 import { CartPanel } from "@/components/site/CartPanel";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -87,6 +88,7 @@ function RootComponent() {
         </main>
         <Footer />
         <CartPanel />
+        <Toaster />
       </div>
     </CartProvider>
   );
