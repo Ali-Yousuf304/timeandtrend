@@ -1,8 +1,10 @@
 import * as React from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, ShoppingBag, X } from "lucide-react";
+import { Heart, Menu, ShoppingBag, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
+import { UserMenu } from "@/components/site/UserMenu";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -16,6 +18,8 @@ const navLinks = [
 
 export function Header() {
   const { count, open } = useCart();
+  const { ids } = useWishlist();
+  const wishCount = ids.size;
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   return (
@@ -44,7 +48,22 @@ export function Header() {
           ))}
         </ul>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <Link
+            to="/wishlist"
+            aria-label="Wishlist"
+            className="relative rounded-md p-2 text-foreground transition-colors hover:text-[var(--gold)]"
+          >
+            <Heart className="h-6 w-6" />
+            {wishCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--gold)] text-[10px] font-bold text-[var(--gold-foreground)]">
+                {wishCount}
+              </span>
+            )}
+          </Link>
+
+          <UserMenu />
+
           <button
             aria-label="Open cart"
             onClick={open}

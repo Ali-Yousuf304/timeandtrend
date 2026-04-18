@@ -1,10 +1,14 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 
 export function CartPanel() {
   const { isOpen, close, items, updateQty, remove, subtotal } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <AnimatePresence>
@@ -101,6 +105,10 @@ export function CartPanel() {
               <Button
                 className="w-full bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"
                 disabled={items.length === 0}
+                onClick={() => {
+                  close();
+                  navigate({ to: user ? "/checkout" : "/auth" });
+                }}
               >
                 Proceed to Checkout
               </Button>
