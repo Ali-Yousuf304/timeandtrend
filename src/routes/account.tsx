@@ -10,7 +10,16 @@ import { toast } from "sonner";
 import { Package, Star, Trash2 } from "lucide-react";
 import { useUserReviews } from "@/hooks/use-reviews";
 
+type AccountTab = "profile" | "address" | "orders" | "reviews";
+
 export const Route = createFileRoute("/account")({
+  validateSearch: (search: Record<string, unknown>): { tab?: AccountTab } => {
+    const t = search.tab;
+    if (t === "profile" || t === "address" || t === "orders" || t === "reviews") {
+      return { tab: t };
+    }
+    return {};
+  },
   head: () => ({
     meta: [
       { title: "My Account — Time & Trend" },
