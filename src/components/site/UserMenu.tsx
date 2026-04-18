@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { User as UserIcon, Heart, Package, LogOut, Shield, LogIn } from "lucide-react";
+import { User as UserIcon, Heart, Package, LogOut, Shield, LogIn, Star } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import {
   DropdownMenu,
