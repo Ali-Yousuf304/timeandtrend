@@ -71,10 +71,10 @@ export function ProductCard({ product, onView }: Props) {
         <h3 className="font-display text-lg font-semibold">{product.name}</h3>
         <p className="mt-1 flex-1 text-sm text-muted-foreground">{product.tagline}</p>
         <p className="mt-3 text-lg font-bold text-[var(--gold)]">
-          ${product.price.toLocaleString()}
+          Rs. {product.price.toLocaleString()}
           {product.oldPrice && (
             <span className="ml-2 text-sm font-normal text-muted-foreground line-through">
-              ${product.oldPrice.toLocaleString()}
+              Rs. {product.oldPrice.toLocaleString()}
             </span>
           )}
         </p>

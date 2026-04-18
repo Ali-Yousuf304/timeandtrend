@@ -62,7 +62,7 @@ export function ProductModal({ product, onClose }: Props) {
                   ))}
                 </ul>
                 <p className="mt-5 font-display text-3xl font-bold text-[var(--gold)]">
-                  ${product.price.toLocaleString()}
+                  Rs. {product.price.toLocaleString()}
                 </p>
                 <Button
                   className="mt-6 bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"

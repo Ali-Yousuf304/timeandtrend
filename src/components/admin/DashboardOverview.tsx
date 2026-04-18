@@ -57,7 +57,7 @@ export function DashboardOverview() {
   const cards = [
     {
       label: "Total Sales",
-      value: `$${stats.sales.toLocaleString()}`,
+      value: `Rs. ${stats.sales.toLocaleString()}`,
       icon: DollarSign,
       tone: "text-[var(--gold)]",
     },
@@ -125,7 +125,7 @@ export function DashboardOverview() {
                   </p>
                 </div>
                 <span className="font-semibold text-[var(--gold)]">
-                  ${Number(o.total).toLocaleString()}
+                  Rs. {Number(o.total).toLocaleString()}
                 </span>
               </li>
             ))}

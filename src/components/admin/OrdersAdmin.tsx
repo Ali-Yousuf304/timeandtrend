@@ -77,7 +77,7 @@ export function OrdersAdmin() {
             </div>
             <div className="flex items-center gap-3">
               <span className="text-lg font-bold text-[var(--gold)]">
-                ${Number(o.total).toLocaleString()}
+                Rs. {Number(o.total).toLocaleString()}
               </span>
               <Select value={o.status} onValueChange={(v) => updateStatus(o.id, v)}>
                 <SelectTrigger className="w-36">
@@ -99,7 +99,7 @@ export function OrdersAdmin() {
                 <span>
                   {it.product_name} × {it.quantity}
                 </span>
-                <span>${(it.unit_price * it.quantity).toLocaleString()}</span>
+                <span>Rs. {(it.unit_price * it.quantity).toLocaleString()}</span>
               </li>
             ))}
           </ul>

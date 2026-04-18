@@ -151,7 +151,7 @@ export function CustomersAdmin() {
                     {c.totalOrders}
                   </td>
                   <td className="px-4 py-3 text-right font-bold text-[var(--gold)]">
-                    ${c.totalSpent.toLocaleString()}
+                    Rs. {c.totalSpent.toLocaleString()}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {new Date(c.lastOrderAt).toLocaleDateString()}
@@ -191,7 +191,7 @@ export function CustomersAdmin() {
                 <div className="rounded-lg border border-border bg-muted/30 p-3">
                   <p className="text-xs text-muted-foreground">Total spent</p>
                   <p className="text-xl font-bold text-[var(--gold)]">
-                    ${selected.totalSpent.toLocaleString()}
+                    Rs. {selected.totalSpent.toLocaleString()}
                   </p>
                 </div>
                 <div className="rounded-lg border border-border bg-muted/30 p-3">
