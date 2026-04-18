@@ -121,7 +121,7 @@ export function CollectionsPreview() {
             >
               <AnimatePresence mode="popLayout">
                 {visible.map((p) => (
-                  <ProductCard key={p.id} product={p} onView={setModalProduct} />
+                  <ProductCard key={p.id} product={p} onQuickView={setModalProduct} />
                 ))}
               </AnimatePresence>
             </motion.div>

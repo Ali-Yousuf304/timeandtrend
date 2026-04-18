@@ -1,11 +1,9 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { X, ArrowRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import type { Product } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
-import { ReviewForm } from "@/components/site/ReviewForm";
-import { ReviewList } from "@/components/site/ReviewList";
-import { useProductReviews } from "@/hooks/use-reviews";
 
 interface Props {
   product: Product | null;
@@ -14,7 +12,6 @@ interface Props {
 
 export function ProductModal({ product, onClose }: Props) {
   const { add } = useCart();
-  const { reviews, loading, reload } = useProductReviews(product?.id);
 
   return (
     <AnimatePresence>
@@ -37,8 +34,7 @@ export function ProductModal({ product, onClose }: Props) {
             <button
               onClick={onClose}
               aria-label="Close"
-              className="sticky right-4 top-4 z-10 ml-auto mr-4 mt-4 block rounded-full bg-background/90 p-2 transition-colors hover:bg-muted"
-              style={{ float: "right" }}
+              className="absolute right-4 top-4 z-10 rounded-full bg-background/90 p-2 transition-colors hover:bg-muted"
             >
               <X className="h-5 w-5" />
             </button>
@@ -51,50 +47,38 @@ export function ProductModal({ product, onClose }: Props) {
                 />
               </div>
               <div className="flex flex-col p-8">
-                <h2 className="font-display text-3xl font-semibold">{product.name}</h2>
-                <p className="mt-3 text-sm text-muted-foreground">{product.description}</p>
-                <ul className="mt-5 space-y-2 border-y border-border py-4 text-sm">
-                  {product.specs.map((s) => (
-                    <li key={s.label} className="flex justify-between">
-                      <span className="text-muted-foreground">{s.label}</span>
-                      <span className="font-medium">{s.value}</span>
-                    </li>
-                  ))}
-                </ul>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  Quick view
+                </p>
+                <h2 className="mt-1 font-display text-3xl font-semibold">{product.name}</h2>
+                <p className="mt-3 text-sm text-muted-foreground">{product.tagline}</p>
                 <p className="mt-5 font-display text-3xl font-bold text-[var(--gold)]">
                   Rs. {product.price.toLocaleString()}
+                  {product.oldPrice && (
+                    <span className="ml-2 text-base font-normal text-muted-foreground line-through">
+                      Rs. {product.oldPrice.toLocaleString()}
+                    </span>
+                  )}
                 </p>
-                <Button
-                  className="mt-6 bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"
-                  size="lg"
-                  onClick={() => {
-                    add(product);
-                    onClose();
-                  }}
-                >
-                  Add to Cart
-                </Button>
-              </div>
-            </div>
-
-            <div className="border-t border-border p-8">
-              <h3 className="font-display text-xl font-semibold">
-                Customer Reviews
-                {reviews.length > 0 && (
-                  <span className="ml-2 text-sm font-normal text-muted-foreground">
-                    ({reviews.length})
-                  </span>
-                )}
-              </h3>
-              <div className="mt-4 space-y-4">
-                <ReviewList
-                  reviews={reviews}
-                  loading={loading}
-                  empty="No reviews yet. Be the first to review!"
-                />
-                <div>
-                  <h4 className="mb-2 text-sm font-semibold">Write a review</h4>
-                  <ReviewForm productId={product.id} onSubmitted={reload} />
+                <div className="mt-6 space-y-3">
+                  <Button
+                    className="w-full bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"
+                    size="lg"
+                    onClick={() => {
+                      add(product);
+                      onClose();
+                    }}
+                  >
+                    Add to Cart
+                  </Button>
+                  <Link
+                    to="/product/$id"
+                    params={{ id: product.id }}
+                    onClick={onClose}
+                    className="flex w-full items-center justify-center gap-2 rounded-md border border-border px-4 py-3 text-sm font-semibold transition-colors hover:bg-muted"
+                  >
+                    View Full Details <ArrowRight className="h-4 w-4" />
+                  </Link>
                 </div>
               </div>
             </div>

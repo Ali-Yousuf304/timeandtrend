@@ -9,6 +9,7 @@ import {
   Users,
   Settings,
   Star,
+  Tag,
   ArrowLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,7 @@ const items: NavItem[] = [
   { to: "/admin/collections", label: "Collections", icon: LayoutList },
   { to: "/admin/banners", label: "Banner", icon: ImageIcon },
   { to: "/admin/reviews", label: "Manage Reviews", icon: Star },
+  { to: "/admin/discounts", label: "Discounts", icon: Tag },
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
