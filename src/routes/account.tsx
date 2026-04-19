@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createFileRoute, useNavigate, Link, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -52,7 +52,7 @@ interface OrderRow {
 function AccountPage() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const search = useSearch({ strict: false }) as { tab?: AccountTab };
+  const search = Route.useSearch();
   const [profile, setProfile] = React.useState<Profile | null>(null);
   const [orders, setOrders] = React.useState<OrderRow[]>([]);
   const [saving, setSaving] = React.useState(false);
