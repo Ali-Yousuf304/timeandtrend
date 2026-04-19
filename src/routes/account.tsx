@@ -115,7 +115,7 @@ function AccountPage() {
       <h1 className="font-display text-4xl font-bold">My Account</h1>
       <p className="mt-1 text-sm text-muted-foreground">{profile.email}</p>
 
-      <Tabs defaultValue={Route.useSearch().tab ?? "profile"} className="mt-8">
+      <Tabs defaultValue={search.tab ?? "profile"} className="mt-8">
         <TabsList>
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="address">Address</TabsTrigger>
