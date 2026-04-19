@@ -257,7 +257,7 @@ export function CustomersAdmin() {
                 <div className="rounded-lg border border-border bg-muted/30 p-3">
                   <p className="text-xs text-muted-foreground">Avg order</p>
                   <p className="text-xl font-bold">
-                    $
+                    Rs.{" "}
                     {Math.round(
                       selected.totalSpent / selected.totalOrders,
                     ).toLocaleString()}
