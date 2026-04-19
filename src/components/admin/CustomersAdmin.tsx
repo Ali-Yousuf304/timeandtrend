@@ -118,58 +118,118 @@ export function CustomersAdmin() {
           No customers yet.
         </p>
       ) : (
-        <div className="overflow-hidden rounded-lg border border-border bg-card">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
-              <tr>
-                <th className="px-4 py-3">Customer</th>
-                <th className="px-4 py-3">Contact</th>
-                <th className="px-4 py-3 text-right">Orders</th>
-                <th className="px-4 py-3 text-right">Spent</th>
-                <th className="px-4 py-3">Last order</th>
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody>
-              {customers.map((c) => (
-                <tr key={c.user_id} className="border-t border-border">
-                  <td className="px-4 py-3">
-                    <p className="font-medium">
+        <>
+          {/* Desktop table */}
+          <div className="hidden overflow-hidden rounded-lg border border-border bg-card md:block">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3">Customer</th>
+                  <th className="px-4 py-3">Contact</th>
+                  <th className="px-4 py-3 text-right">Orders</th>
+                  <th className="px-4 py-3 text-right">Spent</th>
+                  <th className="px-4 py-3">Last order</th>
+                  <th className="px-4 py-3" />
+                </tr>
+              </thead>
+              <tbody>
+                {customers.map((c) => (
+                  <tr key={c.user_id} className="border-t border-border">
+                    <td className="px-4 py-3">
+                      <p className="font-medium">
+                        {c.profile?.display_name ??
+                          c.orders[0]?.shipping_name ??
+                          "Unnamed"}
+                      </p>
+                      <p className="font-mono text-[11px] text-muted-foreground">
+                        {c.user_id.slice(0, 8)}
+                      </p>
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      <p>{c.profile?.email ?? "—"}</p>
+                      <p>{c.profile?.phone ?? c.orders[0]?.shipping_phone ?? "—"}</p>
+                    </td>
+                    <td className="px-4 py-3 text-right font-medium">
+                      {c.totalOrders}
+                    </td>
+                    <td className="px-4 py-3 text-right font-bold text-[var(--gold)]">
+                      Rs. {c.totalSpent.toLocaleString()}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      {new Date(c.lastOrderAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setSelected(c)}
+                      >
+                        <Eye className="mr-1 h-4 w-4" /> View
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile cards */}
+          <div className="space-y-3 md:hidden">
+            {customers.map((c) => (
+              <div
+                key={c.user_id}
+                className="rounded-lg border border-border bg-card p-4"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium">
                       {c.profile?.display_name ??
                         c.orders[0]?.shipping_name ??
                         "Unnamed"}
                     </p>
-                    <p className="font-mono text-[11px] text-muted-foreground">
-                      {c.user_id.slice(0, 8)}
+                    <p className="truncate text-xs text-muted-foreground">
+                      {c.profile?.email ?? "—"}
                     </p>
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    <p>{c.profile?.email ?? "—"}</p>
-                    <p>{c.profile?.phone ?? c.orders[0]?.shipping_phone ?? "—"}</p>
-                  </td>
-                  <td className="px-4 py-3 text-right font-medium">
-                    {c.totalOrders}
-                  </td>
-                  <td className="px-4 py-3 text-right font-bold text-[var(--gold)]">
-                    Rs. {c.totalSpent.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {new Date(c.lastOrderAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setSelected(c)}
-                    >
-                      <Eye className="mr-1 h-4 w-4" /> View
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                    <p className="text-xs text-muted-foreground">
+                      {c.profile?.phone ?? c.orders[0]?.shipping_phone ?? "—"}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setSelected(c)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="mt-3 grid grid-cols-3 gap-2 border-t border-border pt-3 text-center">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                      Orders
+                    </p>
+                    <p className="text-sm font-semibold">{c.totalOrders}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                      Spent
+                    </p>
+                    <p className="text-sm font-bold text-[var(--gold)]">
+                      Rs. {c.totalSpent.toLocaleString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                      Last
+                    </p>
+                    <p className="text-sm font-medium">
+                      {new Date(c.lastOrderAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
@@ -197,7 +257,7 @@ export function CustomersAdmin() {
                 <div className="rounded-lg border border-border bg-muted/30 p-3">
                   <p className="text-xs text-muted-foreground">Avg order</p>
                   <p className="text-xl font-bold">
-                    $
+                    Rs.{" "}
                     {Math.round(
                       selected.totalSpent / selected.totalOrders,
                     ).toLocaleString()}
@@ -264,7 +324,7 @@ export function CustomersAdmin() {
                         </p>
                       </div>
                       <span className="font-semibold text-[var(--gold)]">
-                        ${Number(o.total).toLocaleString()}
+                        Rs. {Number(o.total).toLocaleString()}
                       </span>
                     </li>
                   ))}
