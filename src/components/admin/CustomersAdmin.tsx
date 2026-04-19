@@ -324,7 +324,7 @@ export function CustomersAdmin() {
                         </p>
                       </div>
                       <span className="font-semibold text-[var(--gold)]">
-                        ${Number(o.total).toLocaleString()}
+                        Rs. {Number(o.total).toLocaleString()}
                       </span>
                     </li>
                   ))}
