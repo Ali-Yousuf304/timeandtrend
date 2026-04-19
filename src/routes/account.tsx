@@ -52,6 +52,7 @@ interface OrderRow {
 function AccountPage() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const [profile, setProfile] = React.useState<Profile | null>(null);
   const [orders, setOrders] = React.useState<OrderRow[]>([]);
   const [saving, setSaving] = React.useState(false);
