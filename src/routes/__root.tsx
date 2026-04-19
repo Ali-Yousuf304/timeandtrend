@@ -50,6 +50,12 @@ export const Route = createRootRoute({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Time & Trend — Luxury Watches" },
+      { name: "description", content: "A luxury e-commerce website for watches, featuring dynamic product displays, user accounts, and an admin panel." },
+      { property: "og:description", content: "A luxury e-commerce website for watches, featuring dynamic product displays, user accounts, and an admin panel." },
+      { name: "twitter:description", content: "A luxury e-commerce website for watches, featuring dynamic product displays, user accounts, and an admin panel." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e58b79ae-094c-4f63-8f49-a05159dab9ed/id-preview-0bac8556--06a33d24-58ce-46f5-a5ea-6f94d404a965.lovable.app-1776601423638.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e58b79ae-094c-4f63-8f49-a05159dab9ed/id-preview-0bac8556--06a33d24-58ce-46f5-a5ea-6f94d404a965.lovable.app-1776601423638.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
