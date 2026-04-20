@@ -70,7 +70,17 @@ export function SettingsAdmin() {
     toast.success("Logo uploaded — click Save to apply");
   }
 
-  async function update(patch: Record<string, unknown>, successMsg: string) {
+  async function update(
+    patch: Partial<{
+      payment_methods: never;
+      shipping_flat_rate: number;
+      shipping_free_threshold: number;
+      shipping_note: string | null;
+      logo_url: string | null;
+      whatsapp_number: string | null;
+    }>,
+    successMsg: string,
+  ) {
     if (!settings) return;
     setSaving(true);
     const { error } = await supabase
