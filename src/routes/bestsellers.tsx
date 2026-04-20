@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useProducts } from "@/hooks/use-products";
+import { useAllProductRatings } from "@/hooks/use-product-ratings";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/bestsellers")({
@@ -23,6 +24,7 @@ export const Route = createFileRoute("/bestsellers")({
 
 function BestSellersPage() {
   const { products, loading } = useProducts();
+  const getRating = useAllProductRatings();
   const bestSellers = products.filter((p) => p.badges?.includes("bestseller"));
 
   return (
@@ -52,26 +54,46 @@ function BestSellersPage() {
                 transition={{ delay: idx * 0.1 }}
                 className="flex gap-6 rounded-xl bg-card p-6 shadow-sm transition-shadow hover:shadow-lg"
               >
-                <div className="h-36 w-36 flex-shrink-0 rounded-lg bg-muted p-3">
-                  <img
-                    src={p.image}
-                    alt={p.name}
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-                <div className="flex flex-col justify-center">
-                  <div className="text-[var(--gold)]">
-                    {"★".repeat(p.rating)}
-                    <span className="text-muted-foreground/40">
-                      {"★".repeat(5 - p.rating)}
-                    </span>
-                  </div>
-                  <h2 className="mt-1 font-display text-xl font-semibold">{p.name}</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>
-                  <p className="mt-3 font-bold text-[var(--gold)]">
-                    Rs. {p.price.toLocaleString()}
-                  </p>
-                </div>
+                {(() => {
+                  const rating = getRating(p.id);
+                  const ratingWidth = `${(Math.max(0, Math.min(5, rating.average)) / 5) * 100}%`;
+
+                  return (
+                    <>
+                      <div className="h-36 w-36 flex-shrink-0 rounded-lg bg-muted p-3">
+                        <img
+                          src={p.image}
+                          alt={p.name}
+                          className="h-full w-full object-contain"
+                        />
+                      </div>
+                      <div className="flex flex-col justify-center">
+                        <div className="flex items-center gap-3">
+                          <div className="relative text-lg leading-none tracking-[0.2em] text-muted-foreground/25">
+                            <span aria-hidden="true">★★★★★</span>
+                            <span
+                              aria-hidden="true"
+                              className="absolute inset-y-0 left-0 overflow-hidden whitespace-nowrap text-[var(--gold)]"
+                              style={{ width: ratingWidth }}
+                            >
+                              ★★★★★
+                            </span>
+                          </div>
+                          <span className="text-sm text-muted-foreground">
+                            {rating.count > 0
+                              ? `${rating.average.toFixed(1)} (${rating.count} review${rating.count === 1 ? "" : "s"})`
+                              : "No reviews yet"}
+                          </span>
+                        </div>
+                        <h2 className="mt-1 font-display text-xl font-semibold">{p.name}</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>
+                        <p className="mt-3 font-bold text-[var(--gold)]">
+                          Rs. {p.price.toLocaleString()}
+                        </p>
+                      </div>
+                    </>
+                  );
+                })()}
               </motion.article>
             ))}
           </div>
