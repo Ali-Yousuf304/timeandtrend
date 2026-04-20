@@ -56,6 +56,39 @@ export type Database = {
         }
         Relationships: []
       }
+      collections: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          kind: string
+          name: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          kind?: string
+          name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          kind?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       discounts: {
         Row: {
           active: boolean
