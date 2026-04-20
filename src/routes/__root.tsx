@@ -8,6 +8,7 @@ import { CartPanel } from "@/components/site/CartPanel";
 import { AuthProvider } from "@/context/AuthContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { Toaster } from "@/components/ui/sonner";
+import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 
 function NotFoundComponent() {
   return (
@@ -98,6 +99,7 @@ function RootComponent() {
             </main>
             <Footer />
             <CartPanel />
+            <WhatsAppButton />
             <Toaster />
           </div>
         </CartProvider>
