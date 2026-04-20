@@ -349,6 +349,7 @@ export type Database = {
           shipping_free_threshold: number
           shipping_note: string | null
           updated_at: string
+          whatsapp_number: string | null
         }
         Insert: {
           created_at?: string
@@ -359,6 +360,7 @@ export type Database = {
           shipping_free_threshold?: number
           shipping_note?: string | null
           updated_at?: string
+          whatsapp_number?: string | null
         }
         Update: {
           created_at?: string
@@ -369,6 +371,7 @@ export type Database = {
           shipping_free_threshold?: number
           shipping_note?: string | null
           updated_at?: string
+          whatsapp_number?: string | null
         }
         Relationships: []
       }
