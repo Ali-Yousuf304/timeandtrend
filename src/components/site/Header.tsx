@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { UserMenu } from "@/components/site/UserMenu";
+import { SearchBar } from "@/components/site/SearchBar";
 import { useSiteSettings } from "@/hooks/use-settings";
 import { cn } from "@/lib/utils";
 
@@ -46,7 +47,7 @@ export function Header() {
           )}
         </Link>
 
-        <ul className="hidden items-center gap-8 lg:flex">
+        <ul className="hidden items-center gap-6 lg:flex">
           {navLinks.map((l) => (
             <li key={l.to}>
               <Link
@@ -60,6 +61,10 @@ export function Header() {
             </li>
           ))}
         </ul>
+
+        <div className="mx-4 hidden max-w-xs flex-1 lg:block">
+          <SearchBar />
+        </div>
 
         <div className="flex items-center gap-2">
           <Link
@@ -113,7 +118,10 @@ export function Header() {
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden border-t border-border/40 bg-background lg:hidden"
           >
-            <ul className="flex flex-col px-6 py-4">
+            <div className="px-6 pb-2 pt-4">
+              <SearchBar onNavigate={() => setMobileOpen(false)} />
+            </div>
+            <ul className="flex flex-col px-6 pb-4">
               {navLinks.map((l) => (
                 <li key={l.to}>
                   <Link
