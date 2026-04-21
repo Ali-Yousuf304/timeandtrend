@@ -89,6 +89,36 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_queries: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_read: boolean
+          message: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_read?: boolean
+          message: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       discounts: {
         Row: {
           active: boolean
