@@ -1,11 +1,12 @@
 import * as React from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { Heart, Menu, ShoppingBag, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { UserMenu } from "@/components/site/UserMenu";
 import { SearchBar } from "@/components/site/SearchBar";
+import { ThemeToggle } from "@/components/site/ThemeToggle";
 import { useSiteSettings } from "@/hooks/use-settings";
 import { cn } from "@/lib/utils";
 
@@ -22,8 +23,12 @@ export function Header() {
   const { count, open } = useCart();
   const { ids } = useWishlist();
   const { settings } = useSiteSettings();
+  const { pathname } = useLocation();
   const wishCount = ids.size;
   const [mobileOpen, setMobileOpen] = React.useState(false);
+
+  // Hide site header inside admin panel — admin has its own chrome.
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) return null;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-md">
@@ -81,6 +86,8 @@ export function Header() {
           </Link>
 
           <UserMenu />
+
+          <ThemeToggle className="hidden sm:inline-flex" />
 
           <button
             aria-label="Open cart"
