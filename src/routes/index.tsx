@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, ShieldCheck, Sparkles, Truck } from "lucide-react";
 import heroWatch from "@/assets/hero-watch.jpg";
 import { useProducts } from "@/hooks/use-products";
+import { useAllProductRatings } from "@/hooks/use-product-ratings";
 import { useActiveBanner } from "@/hooks/use-banner";
 import { ProductCard } from "@/components/site/ProductCard";
 import { CollectionsPreview } from "@/components/site/CollectionsPreview";
@@ -47,6 +48,7 @@ const features = [
 
 function HomePage() {
   const { products, loading } = useProducts();
+  const getRating = useAllProductRatings();
   const { banner } = useActiveBanner();
 
   const featured = products.slice(0, 3);
@@ -162,7 +164,11 @@ function HomePage() {
             <h2 className="section-title">This Season's Best Sellers</h2>
             <div className="section-title-underline" />
             <div className="grid gap-6 md:grid-cols-2">
-              {bestSellers.map((p) => (
+              {bestSellers.map((p) => {
+                const rating = getRating(p.id);
+                const ratingWidth = `${(Math.max(0, Math.min(5, rating.average)) / 5) * 100}%`;
+
+                return (
                 <motion.div
                   key={p.id}
                   initial={{ opacity: 0, x: -20 }}
@@ -179,11 +185,22 @@ function HomePage() {
                     />
                   </div>
                   <div className="flex flex-col justify-center">
-                    <div className="text-[var(--gold)]">
-                      {"★".repeat(p.rating)}
-                      <span className="text-muted-foreground/40">
-                        {"★".repeat(5 - p.rating)}
+                    <div className="flex items-center gap-3">
+                      <div className="relative text-lg leading-none tracking-[0.2em] text-muted-foreground/25">
+                        <span aria-hidden="true">★★★★★</span>
+                        <span
+                          aria-hidden="true"
+                          className="absolute inset-y-0 left-0 overflow-hidden whitespace-nowrap text-[var(--gold)]"
+                          style={{ width: ratingWidth }}
+                        >
+                          ★★★★★
+                        </span>
+                      </div>
+                      {rating.count > 0 && (
+                        <span className="text-sm text-muted-foreground">
+                          {rating.average.toFixed(1)} ({rating.count})
                       </span>
+                      )}
                     </div>
                     <h3 className="mt-1 font-display text-lg font-semibold">{p.name}</h3>
                     <p className="text-sm text-muted-foreground">{p.tagline}</p>
@@ -192,7 +209,8 @@ function HomePage() {
                     </p>
                   </div>
                 </motion.div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
