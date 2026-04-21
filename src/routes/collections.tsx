@@ -27,37 +27,36 @@ export const Route = createFileRoute("/collections")({
   component: CollectionsPage,
 });
 
-const categories: { value: "all" | Category; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "men", label: "Men" },
-  { value: "women", label: "Women" },
-  { value: "unisex", label: "Unisex" },
-];
+type FilterValue = "all" | Category | Style;
 
-const styles: { value: "all" | Style; label: string }[] = [
-  { value: "all", label: "All Styles" },
-  { value: "casual", label: "Casual" },
-  { value: "formal", label: "Formal" },
-  { value: "sports", label: "Sports" },
-];
+interface FilterTab {
+  value: FilterValue;
+  label: string;
+  kind: "category" | "style" | "all";
+}
 
-type Sort = "default" | "low-high" | "high-low";
+const tabs: FilterTab[] = [
+  { value: "all", label: "All", kind: "all" },
+  { value: "men", label: "Men", kind: "category" },
+  { value: "women", label: "Women", kind: "category" },
+  { value: "unisex", label: "Unisex", kind: "category" },
+  { value: "casual", label: "Casual", kind: "style" },
+  { value: "formal", label: "Formal", kind: "style" },
+  { value: "sports", label: "Sports", kind: "style" },
+];
 
 function CollectionsPage() {
   const { products, loading } = useProducts();
-  const [cat, setCat] = React.useState<"all" | Category>("all");
-  const [style, setStyle] = React.useState<"all" | Style>("all");
-  const [sort, setSort] = React.useState<Sort>("default");
+  const [active, setActive] = React.useState<FilterTab>(tabs[0]);
   const [modalProduct, setModalProduct] = React.useState<Product | null>(null);
 
   const filtered = React.useMemo(() => {
-    let list = products.filter(
-      (p) => (cat === "all" || p.category === cat) && (style === "all" || p.style === style),
-    );
-    if (sort === "low-high") list = [...list].sort((a, b) => a.price - b.price);
-    if (sort === "high-low") list = [...list].sort((a, b) => b.price - a.price);
-    return list;
-  }, [products, cat, style, sort]);
+    if (active.kind === "all") return products;
+    if (active.kind === "category") {
+      return products.filter((p) => p.category === active.value);
+    }
+    return products.filter((p) => p.style === active.value);
+  }, [products, active]);
 
   return (
     <section className="py-20">
@@ -65,36 +64,24 @@ function CollectionsPage() {
         <h1 className="section-title">Our Collections</h1>
         <div className="section-title-underline" />
 
-        <div className="mb-12 flex flex-wrap items-center justify-center gap-4">
-          <FilterGroup>
-            {categories.map((c) => (
-              <FilterBtn key={c.value} active={cat === c.value} onClick={() => setCat(c.value)}>
-                {c.label}
-              </FilterBtn>
-            ))}
-          </FilterGroup>
-
-          <FilterGroup>
-            {styles.map((s) => (
-              <FilterBtn
-                key={s.value}
-                active={style === s.value}
-                onClick={() => setStyle(s.value)}
+        <div className="mb-12 flex flex-wrap justify-center gap-3 md:mt-8">
+          {tabs.map((t) => {
+            const isActive = active.value === t.value && active.kind === t.kind;
+            return (
+              <button
+                key={`${t.kind}-${t.value}`}
+                onClick={() => setActive(t)}
+                className={cn(
+                  "rounded-md border px-5 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all",
+                  isActive
+                    ? "border-foreground bg-foreground text-background shadow-sm"
+                    : "border-border bg-card text-foreground/80 hover:border-foreground/40",
+                )}
               >
-                {s.label}
-              </FilterBtn>
-            ))}
-          </FilterGroup>
-
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as Sort)}
-            className="rounded-md border border-border bg-card px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
-          >
-            <option value="default">Sort by Price</option>
-            <option value="low-high">Low to High</option>
-            <option value="high-low">High to Low</option>
-          </select>
+                {t.label}
+              </button>
+            );
+          })}
         </div>
 
         {loading ? (
@@ -120,35 +107,5 @@ function CollectionsPage() {
 
       <ProductModal product={modalProduct} onClose={() => setModalProduct(null)} />
     </section>
-  );
-}
-
-function FilterGroup({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex gap-1 rounded-lg bg-secondary p-1.5 shadow-inner">{children}</div>
-  );
-}
-
-function FilterBtn({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "rounded-md px-4 py-1.5 text-sm font-medium transition-all",
-        active
-          ? "bg-card text-[var(--gold)] shadow-sm"
-          : "text-muted-foreground hover:text-foreground",
-      )}
-    >
-      {children}
-    </button>
   );
 }
