@@ -11,6 +11,7 @@ import {
   Star,
   Tag,
   ArrowLeft,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,17 +22,20 @@ interface NavItem {
   exact?: boolean;
 }
 
-const items: NavItem[] = [
+export const adminNavItems: NavItem[] = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/admin/products", label: "Products", icon: Package },
   { to: "/admin/orders", label: "Orders", icon: ShoppingCart },
   { to: "/admin/customers", label: "Customers", icon: Users },
+  { to: "/admin/queries", label: "Customer Queries", icon: Mail },
   { to: "/admin/collections", label: "Collections", icon: LayoutList },
   { to: "/admin/banners", label: "Banner", icon: ImageIcon },
   { to: "/admin/reviews", label: "Manage Reviews", icon: Star },
   { to: "/admin/discounts", label: "Discounts", icon: Tag },
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
+
+const items = adminNavItems;
 
 export function AdminSidebar() {
   const { pathname } = useLocation();
