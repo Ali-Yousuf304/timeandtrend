@@ -33,14 +33,16 @@ export async function trackEvent(
   } = {},
 ) {
   try {
-    await supabase.from("analytics_events").insert({
+    const row = {
       event_type,
       session_id: getSessionId(),
       user_id: opts.user_id ?? null,
       product_id: opts.product_id ?? null,
       path: opts.path ?? (typeof window !== "undefined" ? window.location.pathname : null),
-      metadata: opts.metadata ?? {},
-    });
+      metadata: (opts.metadata ?? {}) as Record<string, unknown>,
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase.from("analytics_events") as any).insert(row);
   } catch {
     // ignore
   }
