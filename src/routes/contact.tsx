@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useSiteSettings } from "@/hooks/use-settings";
+import { useAuth } from "@/context/AuthContext";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -47,6 +49,8 @@ const contactSchema = z.object({
 
 function ContactPage() {
   const [submitting, setSubmitting] = React.useState(false);
+  const { settings } = useSiteSettings();
+  const { user } = useAuth();
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -67,6 +71,7 @@ function ContactPage() {
       name: parsed.data.name,
       email: parsed.data.email,
       message: parsed.data.message,
+      user_id: user?.id ?? null,
     });
     setSubmitting(false);
 
@@ -78,10 +83,15 @@ function ContactPage() {
     form.reset();
   };
 
+  const email = settings?.contact_email ?? "timeandtrend000@gmail.com";
+  const phone = settings?.contact_phone ?? "+92 331 0006549";
+  const address = settings?.contact_address ?? "Karachi, Pakistan";
+  const phoneDigits = phone.replace(/[^\d]/g, "");
+
   const contacts = [
-    { icon: Mail, label: "timeandtrend000@gmail.com", href: "mailto:timeandtrend000@gmail.com" },
-    { icon: Phone, label: "+92 331 0006549", href: "https://wa.me/923310006549" },
-    { icon: MapPin, label: "Karachi, Pakistan" },
+    { icon: Mail, label: email, href: `mailto:${email}` },
+    { icon: Phone, label: phone, href: `https://wa.me/${phoneDigits}` },
+    { icon: MapPin, label: address },
   ];
 
   return (

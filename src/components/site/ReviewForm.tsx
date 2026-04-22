@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Star } from "lucide-react";
+import { Star, Upload, X as XIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,9 @@ interface Props {
   onSubmitted?: () => void;
 }
 
+const MAX_IMAGES = 4;
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
 export function ReviewForm({ productId, onSubmitted }: Props) {
   const { user } = useAuth();
   const [rating, setRating] = React.useState(5);
@@ -21,9 +24,11 @@ export function ReviewForm({ productId, onSubmitted }: Props) {
   const [name, setName] = React.useState("");
   const [title, setTitle] = React.useState("");
   const [body, setBody] = React.useState("");
+  const [images, setImages] = React.useState<string[]>([]);
+  const [uploading, setUploading] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
+  const fileInput = React.useRef<HTMLInputElement>(null);
 
-  // Prefill name from profile
   React.useEffect(() => {
     if (!user) return;
     supabase
@@ -47,6 +52,34 @@ export function ReviewForm({ productId, onSubmitted }: Props) {
     );
   }
 
+  async function handleFiles(files: FileList | null) {
+    if (!files || !files.length || !user) return;
+    const remaining = MAX_IMAGES - images.length;
+    const batch = Array.from(files).slice(0, remaining);
+    setUploading(true);
+    const uploaded: string[] = [];
+    for (const file of batch) {
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`${file.name} exceeds 5MB`);
+        continue;
+      }
+      const ext = file.name.split(".").pop() ?? "jpg";
+      const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error } = await supabase.storage
+        .from("review-images")
+        .upload(path, file, { upsert: false, cacheControl: "3600" });
+      if (error) {
+        toast.error(error.message);
+        continue;
+      }
+      const { data } = supabase.storage.from("review-images").getPublicUrl(path);
+      uploaded.push(data.publicUrl);
+    }
+    setImages((prev) => [...prev, ...uploaded]);
+    setUploading(false);
+    if (fileInput.current) fileInput.current.value = "";
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) {
@@ -59,19 +92,20 @@ export function ReviewForm({ productId, onSubmitted }: Props) {
     }
     setSubmitting(true);
 
-    // Save the name to the user's profile so admin sees the reviewer name
     await supabase
       .from("profiles")
       .update({ display_name: name.trim() })
       .eq("id", user!.id);
 
-    const { error } = await supabase.from("reviews").upsert(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.from("reviews") as any).upsert(
       {
         user_id: user!.id,
         product_id: productId,
         rating,
         title: title.trim() || null,
         body: body.trim(),
+        image_urls: images,
       },
       { onConflict: "user_id,product_id" },
     );
@@ -83,6 +117,7 @@ export function ReviewForm({ productId, onSubmitted }: Props) {
       setTitle("");
       setBody("");
       setRating(5);
+      setImages([]);
       onSubmitted?.();
     }
   }
@@ -144,9 +179,50 @@ export function ReviewForm({ productId, onSubmitted }: Props) {
           required
         />
       </div>
+
+      <div>
+        <Label className="text-xs">
+          Photos (optional) — up to {MAX_IMAGES}
+        </Label>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {images.map((url) => (
+            <div key={url} className="relative h-20 w-20 overflow-hidden rounded-md border border-border">
+              <img src={url} alt="Review" className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => setImages((prev) => prev.filter((u) => u !== url))}
+                className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 text-white hover:bg-black/80"
+                aria-label="Remove"
+              >
+                <XIcon className="h-3 w-3" />
+              </button>
+            </div>
+          ))}
+          {images.length < MAX_IMAGES && (
+            <button
+              type="button"
+              onClick={() => fileInput.current?.click()}
+              disabled={uploading}
+              className="flex h-20 w-20 flex-col items-center justify-center gap-1 rounded-md border border-dashed border-border text-xs text-muted-foreground transition-colors hover:border-[var(--gold)] hover:text-[var(--gold)] disabled:opacity-50"
+            >
+              <Upload className="h-4 w-4" />
+              <span>{uploading ? "Uploading…" : "Upload"}</span>
+            </button>
+          )}
+        </div>
+        <input
+          ref={fileInput}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={(e) => handleFiles(e.target.files)}
+        />
+      </div>
+
       <Button
         type="submit"
-        disabled={submitting}
+        disabled={submitting || uploading}
         className="bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"
       >
         {submitting ? "Submitting…" : "Submit review"}
