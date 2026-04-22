@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, Upload, X as XIcon } from "lucide-react";
 
 interface DbProduct {
   id: string;
@@ -29,10 +29,13 @@ interface DbProduct {
 }
 
 const ALL_BADGES = ["new", "bestseller"] as const;
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export function ProductsAdmin() {
   const [items, setItems] = React.useState<DbProduct[]>([]);
   const [editing, setEditing] = React.useState<Partial<DbProduct> | null>(null);
+  const [uploading, setUploading] = React.useState(false);
+  const fileInput = React.useRef<HTMLInputElement>(null);
 
   const load = React.useCallback(async () => {
     const { data } = await supabase
@@ -46,8 +49,37 @@ export function ProductsAdmin() {
     load();
   }, [load]);
 
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !editing) return;
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("Image must be under 5MB");
+      return;
+    }
+    setUploading(true);
+    const ext = file.name.split(".").pop() ?? "jpg";
+    const path = `products/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error } = await supabase.storage
+      .from("product-images")
+      .upload(path, file, { upsert: false, cacheControl: "3600" });
+    if (error) {
+      setUploading(false);
+      toast.error(error.message);
+      return;
+    }
+    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+    setEditing({ ...editing, image: data.publicUrl });
+    setUploading(false);
+    toast.success("Image uploaded");
+    if (fileInput.current) fileInput.current.value = "";
+  }
+
   async function save() {
     if (!editing) return;
+    if (!editing.image) {
+      toast.error("Please upload or provide a product image");
+      return;
+    }
     const payload = {
       name: editing.name ?? "",
       tagline: editing.tagline ?? "",
@@ -145,14 +177,56 @@ export function ProductsAdmin() {
                 }
               />
             </div>
+
             <div className="md:col-span-2">
-              <Label>Image URL</Label>
+              <Label>Product image</Label>
+              {editing.image ? (
+                <div className="mt-2 flex items-center gap-3 rounded-md border border-border bg-muted/30 p-3">
+                  <img
+                    src={editing.image}
+                    alt=""
+                    className="h-20 w-20 rounded bg-card object-contain p-1"
+                  />
+                  <div className="flex-1 break-all text-xs text-muted-foreground">
+                    {editing.image}
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setEditing({ ...editing, image: "" })}
+                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    <XIcon className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : null}
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInput.current?.click()}
+                  disabled={uploading}
+                >
+                  <Upload className="mr-1 h-4 w-4" />
+                  {uploading ? "Uploading…" : editing.image ? "Replace image" : "Upload image"}
+                </Button>
+                <input
+                  ref={fileInput}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+                <span className="text-xs text-muted-foreground">or paste a URL below</span>
+              </div>
               <Input
+                className="mt-2"
                 value={editing.image ?? ""}
                 onChange={(e) => setEditing({ ...editing, image: e.target.value })}
                 placeholder="https://…"
               />
             </div>
+
             <div>
               <Label>Category</Label>
               <Select
