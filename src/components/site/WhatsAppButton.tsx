@@ -2,6 +2,7 @@ import { useSiteSettings } from "@/hooks/use-settings";
 
 export function WhatsAppButton() {
   const { settings } = useSiteSettings();
+  if (settings && settings.whatsapp_enabled === false) return null;
   const raw = settings?.whatsapp_number?.trim();
   if (!raw) return null;
 
@@ -23,7 +24,6 @@ export function WhatsAppButton() {
       aria-label="Chat on WhatsApp"
       className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/20 transition-transform hover:scale-110 hover:bg-[#20bd5a] focus:outline-none focus:ring-2 focus:ring-[#25D366] focus:ring-offset-2"
     >
-      {/* Official WhatsApp logo */}
       <svg
         viewBox="0 0 32 32"
         className="h-8 w-8"

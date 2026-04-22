@@ -128,3 +128,23 @@
     @apply mx-auto mb-12 h-[3px] w-16 bg-[var(--gold)];
   }
 }
+
+@layer utilities {
+  .marquee {
+    position: relative;
+    overflow: hidden;
+  }
+  .marquee-track {
+    display: inline-flex;
+    white-space: nowrap;
+    animation: marquee-scroll 40s linear infinite;
+    will-change: transform;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+  @keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+}

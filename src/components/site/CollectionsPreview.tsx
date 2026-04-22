@@ -1,5 +1,4 @@
 import * as React from "react";
-import { motion } from "framer-motion";
 import { type Category, type Product, type Style } from "@/data/products";
 import { useProducts } from "@/hooks/use-products";
 import { ProductCard } from "@/components/site/ProductCard";
@@ -28,7 +27,6 @@ export function CollectionsPreview() {
   const { products, loading } = useProducts();
   const [active, setActive] = React.useState<FilterTab>(tabs[0]);
   const [modalProduct, setModalProduct] = React.useState<Product | null>(null);
-  const [paused, setPaused] = React.useState(false);
 
   const filtered = React.useMemo(() => {
     if (active.kind === "all") return products;
@@ -37,8 +35,11 @@ export function CollectionsPreview() {
     return products.filter((p) => p.style === active.value);
   }, [products, active]);
 
-  // Duplicate the list so the marquee can loop seamlessly.
+  // Duplicate the list so the CSS marquee can loop seamlessly.
   const loop = React.useMemo(() => [...filtered, ...filtered], [filtered]);
+
+  // Duration proportional to items, capped for readability.
+  const duration = Math.max(25, filtered.length * 6);
 
   return (
     <section id="collections" className="bg-secondary/40 py-20">
@@ -80,30 +81,21 @@ export function CollectionsPreview() {
             No products in this collection yet.
           </p>
         ) : (
-          <div
-            className="group relative overflow-hidden"
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
-          >
-            <motion.div
+          <div className="marquee group relative">
+            <div
+              className="marquee-track gap-6 px-6 md:gap-8 md:px-8"
+              style={{ animationDuration: `${duration}s` }}
               key={active.kind + active.value + filtered.length}
-              className="flex w-max gap-6 px-6 md:gap-8 md:px-8"
-              animate={{ x: paused ? undefined : ["0%", "-50%"] }}
-              transition={{
-                duration: Math.max(20, filtered.length * 6),
-                ease: "linear",
-                repeat: Infinity,
-              }}
             >
               {loop.map((p, i) => (
                 <div
                   key={`${p.id}-${i}`}
-                  className="w-[260px] shrink-0 sm:w-[280px] md:w-[300px]"
+                  className="mx-3 w-[260px] shrink-0 sm:w-[280px] md:w-[300px]"
                 >
                   <ProductCard product={p} onQuickView={setModalProduct} />
                 </div>
               ))}
-            </motion.div>
+            </div>
 
             {/* Edge fades */}
             <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-secondary/40 to-transparent" />

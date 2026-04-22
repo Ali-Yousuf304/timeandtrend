@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json
+          path: string | null
+          product_id: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json
+          path?: string | null
+          product_id?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json
+          path?: string | null
+          product_id?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       banners: {
         Row: {
           active: boolean
@@ -98,6 +131,7 @@ export type Database = {
           message: string
           name: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -107,6 +141,7 @@ export type Database = {
           message: string
           name: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -116,8 +151,47 @@ export type Database = {
           message?: string
           name?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
+      }
+      customer_query_replies: {
+        Row: {
+          author_id: string | null
+          author_role: string
+          created_at: string
+          id: string
+          message: string
+          query_id: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          author_role: string
+          created_at?: string
+          id?: string
+          message: string
+          query_id: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          author_role?: string
+          created_at?: string
+          id?: string
+          message?: string
+          query_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_query_replies_query_id_fkey"
+            columns: ["query_id"]
+            isOneToOne: false
+            referencedRelation: "customer_queries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       discounts: {
         Row: {
@@ -358,12 +432,40 @@ export type Database = {
         }
         Relationships: []
       }
+      promo_messages: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          message: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          message: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          message?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           body: string
           created_at: string
           enabled: boolean
           id: string
+          image_urls: string[]
           product_id: string
           rating: number
           title: string | null
@@ -375,6 +477,7 @@ export type Database = {
           created_at?: string
           enabled?: boolean
           id?: string
+          image_urls?: string[]
           product_id: string
           rating: number
           title?: string | null
@@ -386,6 +489,7 @@ export type Database = {
           created_at?: string
           enabled?: boolean
           id?: string
+          image_urls?: string[]
           product_id?: string
           rating?: number
           title?: string | null
@@ -404,6 +508,9 @@ export type Database = {
       }
       site_settings: {
         Row: {
+          contact_address: string | null
+          contact_email: string | null
+          contact_phone: string | null
           created_at: string
           id: string
           logo_url: string | null
@@ -411,10 +518,16 @@ export type Database = {
           shipping_flat_rate: number
           shipping_free_threshold: number
           shipping_note: string | null
+          social_links: Json
+          store_name: string | null
           updated_at: string
+          whatsapp_enabled: boolean
           whatsapp_number: string | null
         }
         Insert: {
+          contact_address?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           id?: string
           logo_url?: string | null
@@ -422,10 +535,16 @@ export type Database = {
           shipping_flat_rate?: number
           shipping_free_threshold?: number
           shipping_note?: string | null
+          social_links?: Json
+          store_name?: string | null
           updated_at?: string
+          whatsapp_enabled?: boolean
           whatsapp_number?: string | null
         }
         Update: {
+          contact_address?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           id?: string
           logo_url?: string | null
@@ -433,7 +552,10 @@ export type Database = {
           shipping_flat_rate?: number
           shipping_free_threshold?: number
           shipping_note?: string | null
+          social_links?: Json
+          store_name?: string | null
           updated_at?: string
+          whatsapp_enabled?: boolean
           whatsapp_number?: string | null
         }
         Relationships: []

@@ -10,6 +10,7 @@ import { WishlistProvider } from "@/context/WishlistContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { Toaster } from "@/components/ui/sonner";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
+import { PageViewTracker } from "@/components/site/PageViewTracker";
 
 function NotFoundComponent() {
   return (
@@ -95,6 +96,7 @@ function RootComponent() {
         <WishlistProvider>
           <CartProvider>
             <div className="flex min-h-screen flex-col">
+              <PageViewTracker />
               <Header />
               <main className="flex-1">
                 <Outlet />
