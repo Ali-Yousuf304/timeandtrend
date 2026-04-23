@@ -21,6 +21,7 @@ interface DbProduct {
   price: number;
   old_price: number | null;
   image: string;
+  images: string[];
   category: "men" | "women" | "unisex";
   style: "casual" | "formal" | "sports";
   badges: string[] | null;
@@ -30,6 +31,7 @@ interface DbProduct {
 
 const ALL_BADGES = ["new", "bestseller"] as const;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const MAX_IMAGES = 5;
 
 export function ProductsAdmin() {
   const [items, setItems] = React.useState<DbProduct[]>([]);
@@ -49,29 +51,73 @@ export function ProductsAdmin() {
     load();
   }, [load]);
 
+  const allImages = React.useMemo(() => {
+    if (!editing) return [] as string[];
+    return [editing.image, ...(editing.images ?? [])].filter(
+      (u): u is string => !!u && u.length > 0,
+    );
+  }, [editing]);
+
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file || !editing) return;
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error("Image must be under 5MB");
+    const files = e.target.files;
+    if (!files || !files.length || !editing) return;
+    const remaining = MAX_IMAGES - allImages.length;
+    if (remaining <= 0) {
+      toast.error(`Maximum ${MAX_IMAGES} images allowed`);
       return;
     }
     setUploading(true);
-    const ext = file.name.split(".").pop() ?? "jpg";
-    const path = `products/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-    const { error } = await supabase.storage
-      .from("product-images")
-      .upload(path, file, { upsert: false, cacheControl: "3600" });
-    if (error) {
-      setUploading(false);
-      toast.error(error.message);
-      return;
+    const uploaded: string[] = [];
+    for (const file of Array.from(files).slice(0, remaining)) {
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`${file.name} exceeds 5MB`);
+        continue;
+      }
+      const ext = file.name.split(".").pop() ?? "jpg";
+      const path = `products/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error } = await supabase.storage
+        .from("product-images")
+        .upload(path, file, { upsert: false, cacheControl: "3600" });
+      if (error) {
+        toast.error(error.message);
+        continue;
+      }
+      const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+      uploaded.push(data.publicUrl);
     }
-    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
-    setEditing({ ...editing, image: data.publicUrl });
+    if (uploaded.length) {
+      const newImage = editing.image || uploaded[0];
+      const extras = editing.image
+        ? [...(editing.images ?? []), ...uploaded]
+        : [...(editing.images ?? []), ...uploaded.slice(1)];
+      setEditing({ ...editing, image: newImage, images: extras });
+      toast.success(`Uploaded ${uploaded.length} image${uploaded.length === 1 ? "" : "s"}`);
+    }
     setUploading(false);
-    toast.success("Image uploaded");
     if (fileInput.current) fileInput.current.value = "";
+  }
+
+  function removeImage(url: string) {
+    if (!editing) return;
+    if (editing.image === url) {
+      const next = editing.images ?? [];
+      setEditing({ ...editing, image: next[0] ?? "", images: next.slice(1) });
+    } else {
+      setEditing({
+        ...editing,
+        images: (editing.images ?? []).filter((u) => u !== url),
+      });
+    }
+  }
+
+  function setAsMain(url: string) {
+    if (!editing || editing.image === url) return;
+    const others = allImages.filter((u) => u !== url && u !== editing.image);
+    setEditing({
+      ...editing,
+      image: url,
+      images: editing.image ? [editing.image, ...others] : others,
+    });
   }
 
   async function save() {
