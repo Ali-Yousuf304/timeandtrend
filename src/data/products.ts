@@ -18,6 +18,8 @@ export interface Product {
   price: number;
   oldPrice?: number;
   image: string;
+  /** Additional images beyond the main `image`. Combined gallery = [image, ...images]. */
+  images?: string[];
   category: Category;
   style: Style;
   badges?: Badge[];
