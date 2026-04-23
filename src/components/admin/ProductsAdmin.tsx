@@ -132,6 +132,7 @@ export function ProductsAdmin() {
       price: Number(editing.price ?? 0),
       old_price: editing.old_price ? Number(editing.old_price) : null,
       image: editing.image ?? "",
+      images: editing.images ?? [],
       category: (editing.category ?? "men") as DbProduct["category"],
       style: (editing.style ?? "casual") as DbProduct["style"],
       badges: editing.badges ?? [],
