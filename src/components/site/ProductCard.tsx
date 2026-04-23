@@ -85,8 +85,20 @@ export function ProductCard({ product, onQuickView }: Props) {
           src={product.image}
           alt={product.name}
           loading="lazy"
-          className="h-full w-full object-contain p-6 transition-transform duration-500 group-hover:scale-110"
+          className={cn(
+            "h-full w-full object-contain p-6 transition-all duration-500 group-hover:scale-110",
+            product.images && product.images.length > 0 && "group-hover:opacity-0",
+          )}
         />
+        {product.images && product.images.length > 0 && (
+          <img
+            src={product.images[0]}
+            alt={`${product.name} alternate view`}
+            loading="lazy"
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-contain p-6 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          />
+        )}
       </div>
       <div className="flex flex-1 flex-col p-4 text-center">
         <h3 className="font-display text-lg font-semibold">{product.name}</h3>

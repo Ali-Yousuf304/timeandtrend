@@ -21,6 +21,7 @@ interface DbProduct {
   price: number;
   old_price: number | null;
   image: string;
+  images: string[];
   category: "men" | "women" | "unisex";
   style: "casual" | "formal" | "sports";
   badges: string[] | null;
@@ -30,6 +31,7 @@ interface DbProduct {
 
 const ALL_BADGES = ["new", "bestseller"] as const;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const MAX_IMAGES = 5;
 
 export function ProductsAdmin() {
   const [items, setItems] = React.useState<DbProduct[]>([]);
@@ -49,29 +51,73 @@ export function ProductsAdmin() {
     load();
   }, [load]);
 
+  const allImages = React.useMemo(() => {
+    if (!editing) return [] as string[];
+    return [editing.image, ...(editing.images ?? [])].filter(
+      (u): u is string => !!u && u.length > 0,
+    );
+  }, [editing]);
+
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file || !editing) return;
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error("Image must be under 5MB");
+    const files = e.target.files;
+    if (!files || !files.length || !editing) return;
+    const remaining = MAX_IMAGES - allImages.length;
+    if (remaining <= 0) {
+      toast.error(`Maximum ${MAX_IMAGES} images allowed`);
       return;
     }
     setUploading(true);
-    const ext = file.name.split(".").pop() ?? "jpg";
-    const path = `products/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-    const { error } = await supabase.storage
-      .from("product-images")
-      .upload(path, file, { upsert: false, cacheControl: "3600" });
-    if (error) {
-      setUploading(false);
-      toast.error(error.message);
-      return;
+    const uploaded: string[] = [];
+    for (const file of Array.from(files).slice(0, remaining)) {
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`${file.name} exceeds 5MB`);
+        continue;
+      }
+      const ext = file.name.split(".").pop() ?? "jpg";
+      const path = `products/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error } = await supabase.storage
+        .from("product-images")
+        .upload(path, file, { upsert: false, cacheControl: "3600" });
+      if (error) {
+        toast.error(error.message);
+        continue;
+      }
+      const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+      uploaded.push(data.publicUrl);
     }
-    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
-    setEditing({ ...editing, image: data.publicUrl });
+    if (uploaded.length) {
+      const newImage = editing.image || uploaded[0];
+      const extras = editing.image
+        ? [...(editing.images ?? []), ...uploaded]
+        : [...(editing.images ?? []), ...uploaded.slice(1)];
+      setEditing({ ...editing, image: newImage, images: extras });
+      toast.success(`Uploaded ${uploaded.length} image${uploaded.length === 1 ? "" : "s"}`);
+    }
     setUploading(false);
-    toast.success("Image uploaded");
     if (fileInput.current) fileInput.current.value = "";
+  }
+
+  function removeImage(url: string) {
+    if (!editing) return;
+    if (editing.image === url) {
+      const next = editing.images ?? [];
+      setEditing({ ...editing, image: next[0] ?? "", images: next.slice(1) });
+    } else {
+      setEditing({
+        ...editing,
+        images: (editing.images ?? []).filter((u) => u !== url),
+      });
+    }
+  }
+
+  function setAsMain(url: string) {
+    if (!editing || editing.image === url) return;
+    const others = allImages.filter((u) => u !== url && u !== editing.image);
+    setEditing({
+      ...editing,
+      image: url,
+      images: editing.image ? [editing.image, ...others] : others,
+    });
   }
 
   async function save() {
@@ -86,6 +132,7 @@ export function ProductsAdmin() {
       price: Number(editing.price ?? 0),
       old_price: editing.old_price ? Number(editing.old_price) : null,
       image: editing.image ?? "",
+      images: editing.images ?? [],
       category: (editing.category ?? "men") as DbProduct["category"],
       style: (editing.style ?? "casual") as DbProduct["style"],
       badges: editing.badges ?? [],
@@ -179,52 +226,65 @@ export function ProductsAdmin() {
             </div>
 
             <div className="md:col-span-2">
-              <Label>Product image</Label>
-              {editing.image ? (
-                <div className="mt-2 flex items-center gap-3 rounded-md border border-border bg-muted/30 p-3">
-                  <img
-                    src={editing.image}
-                    alt=""
-                    className="h-20 w-20 rounded bg-card object-contain p-1"
-                  />
-                  <div className="flex-1 break-all text-xs text-muted-foreground">
-                    {editing.image}
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setEditing({ ...editing, image: "" })}
-                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+              <Label>Product images (up to {MAX_IMAGES}) — first is the main image</Label>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {allImages.map((url, i) => (
+                  <div
+                    key={url}
+                    className={
+                      "relative h-24 w-24 overflow-hidden rounded-md border-2 " +
+                      (i === 0 ? "border-[var(--gold)]" : "border-border")
+                    }
                   >
-                    <XIcon className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : null}
-              <div className="mt-2 flex flex-wrap items-center gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileInput.current?.click()}
-                  disabled={uploading}
-                >
-                  <Upload className="mr-1 h-4 w-4" />
-                  {uploading ? "Uploading…" : editing.image ? "Replace image" : "Upload image"}
-                </Button>
-                <input
-                  ref={fileInput}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageUpload}
-                />
-                <span className="text-xs text-muted-foreground">or paste a URL below</span>
+                    <img src={url} alt="" className="h-full w-full bg-card object-contain p-1" />
+                    {i === 0 && (
+                      <span className="absolute bottom-0 left-0 right-0 bg-[var(--gold)] px-1 text-center text-[9px] font-bold uppercase text-[var(--gold-foreground)]">
+                        Main
+                      </span>
+                    )}
+                    {i !== 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setAsMain(url)}
+                        title="Set as main"
+                        className="absolute left-1 top-1 rounded-full bg-background/90 px-1.5 text-[9px] font-bold uppercase shadow hover:bg-[var(--gold)] hover:text-[var(--gold-foreground)]"
+                      >
+                        Set main
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeImage(url)}
+                      aria-label="Remove"
+                      className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 text-white hover:bg-black/80"
+                    >
+                      <XIcon className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+                {allImages.length < MAX_IMAGES && (
+                  <button
+                    type="button"
+                    onClick={() => fileInput.current?.click()}
+                    disabled={uploading}
+                    className="flex h-24 w-24 flex-col items-center justify-center gap-1 rounded-md border-2 border-dashed border-border text-xs text-muted-foreground transition-colors hover:border-[var(--gold)] hover:text-[var(--gold)] disabled:opacity-50"
+                  >
+                    <Upload className="h-5 w-5" />
+                    <span>{uploading ? "Uploading…" : "Upload"}</span>
+                  </button>
+                )}
               </div>
-              <Input
-                className="mt-2"
-                value={editing.image ?? ""}
-                onChange={(e) => setEditing({ ...editing, image: e.target.value })}
-                placeholder="https://…"
+              <input
+                ref={fileInput}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleImageUpload}
               />
+              <p className="mt-2 text-xs text-muted-foreground">
+                {allImages.length} / {MAX_IMAGES} images
+              </p>
             </div>
 
             <div>

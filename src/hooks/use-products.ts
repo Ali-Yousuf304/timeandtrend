@@ -9,6 +9,7 @@ interface DbProductRow {
   price: number;
   old_price: number | null;
   image: string;
+  images?: string[] | null;
   category: string;
   style: string;
   badges: string[] | null;
@@ -32,6 +33,7 @@ function mapProduct(row: DbProductRow): Product {
     price: Number(row.price),
     oldPrice: row.old_price != null ? Number(row.old_price) : undefined,
     image: row.image,
+    images: Array.isArray(row.images) ? row.images.filter(Boolean) : [],
     category: (["men", "women", "unisex"].includes(row.category)
       ? row.category
       : "unisex") as Category,
@@ -57,7 +59,7 @@ export function useProducts() {
       const { data } = await supabase
         .from("products")
         .select(
-          "id,name,tagline,price,old_price,image,category,style,badges,rating,description,specs",
+          "id,name,tagline,price,old_price,image,images,category,style,badges,rating,description,specs",
         )
         .order("created_at", { ascending: false });
       if (cancelled) return;
