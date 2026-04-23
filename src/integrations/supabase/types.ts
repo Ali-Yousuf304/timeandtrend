@@ -279,11 +279,16 @@ export type Database = {
       orders: {
         Row: {
           created_at: string
+          customer_email: string | null
           discount_amount: number
+          fulfillment_status: string
           id: string
+          payment_method: string | null
+          payment_status: string
           promo_code: string | null
           shipping_address_line1: string | null
           shipping_address_line2: string | null
+          shipping_amount: number
           shipping_city: string | null
           shipping_country: string | null
           shipping_name: string | null
@@ -298,11 +303,16 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          customer_email?: string | null
           discount_amount?: number
+          fulfillment_status?: string
           id?: string
+          payment_method?: string | null
+          payment_status?: string
           promo_code?: string | null
           shipping_address_line1?: string | null
           shipping_address_line2?: string | null
+          shipping_amount?: number
           shipping_city?: string | null
           shipping_country?: string | null
           shipping_name?: string | null
@@ -317,11 +327,16 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          customer_email?: string | null
           discount_amount?: number
+          fulfillment_status?: string
           id?: string
+          payment_method?: string | null
+          payment_status?: string
           promo_code?: string | null
           shipping_address_line1?: string | null
           shipping_address_line2?: string | null
+          shipping_amount?: number
           shipping_city?: string | null
           shipping_country?: string | null
           shipping_name?: string | null
@@ -344,6 +359,7 @@ export type Database = {
           description: string
           id: string
           image: string
+          images: string[]
           name: string
           old_price: number | null
           price: number
@@ -360,6 +376,7 @@ export type Database = {
           description?: string
           id?: string
           image: string
+          images?: string[]
           name: string
           old_price?: number | null
           price: number
@@ -376,6 +393,7 @@ export type Database = {
           description?: string
           id?: string
           image?: string
+          images?: string[]
           name?: string
           old_price?: number | null
           price?: number
