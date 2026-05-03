@@ -31,7 +31,7 @@ export function Footer() {
   return (
     <footer className="bg-[var(--ink)] text-[var(--ink-foreground)]">
       {/* Running promo bar */}
-      {messages.length > 0 && (
+      {false && messages.length > 0 && (
         <div className="overflow-hidden border-b border-white/10 bg-[var(--gold)]/10 py-2">
           <div className="marquee whitespace-nowrap text-xs font-medium uppercase tracking-[0.2em] text-[var(--gold)]">
             <div className="marquee-track">
