@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { sendEmail } from "@/lib/email";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -37,9 +38,13 @@ function AuthPage() {
       if (error) toast.error(error);
       else toast.success("Welcome back!");
     } else {
-      const { error } = await signUp(email, password, displayName || email.split("@")[0]);
+      const name = displayName || email.split("@")[0];
+      const { error } = await signUp(email, password, name);
       if (error) toast.error(error);
-      else toast.success("Account created!");
+      else {
+        sendEmail("welcome", email, { name });
+        toast.success("Account created!");
+      }
     }
     setBusy(false);
   }
