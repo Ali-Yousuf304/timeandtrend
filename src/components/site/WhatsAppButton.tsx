@@ -1,7 +1,10 @@
+import { useLocation } from "@tanstack/react-router";
 import { useSiteSettings } from "@/hooks/use-settings";
 
 export function WhatsAppButton() {
   const { settings } = useSiteSettings();
+  const { pathname } = useLocation();
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) return null;
   if (settings && settings.whatsapp_enabled === false) return null;
   const raw = settings?.whatsapp_number?.trim();
   if (!raw) return null;
