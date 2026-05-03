@@ -4,10 +4,11 @@ import { Star, Heart, ShoppingCart, ArrowLeft } from "lucide-react";
 import { useProduct, useProducts } from "@/hooks/use-products";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useSiteSettings } from "@/hooks/use-settings";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ReviewForm } from "@/components/site/ReviewForm";
 import { ReviewList } from "@/components/site/ReviewList";
+import { ReviewSummary } from "@/components/site/ReviewSummary";
 import { ProductCard } from "@/components/site/ProductCard";
 import { useProductReviews } from "@/hooks/use-reviews";
 import { useProductRating } from "@/hooks/use-product-ratings";
@@ -49,8 +50,18 @@ function ProductPage() {
   const { products } = useProducts();
   const { add } = useCart();
   const { has, toggle } = useWishlist();
+  const { settings } = useSiteSettings();
   const { reviews, loading: reviewsLoading, reload } = useProductReviews(id);
   const rating = useProductRating(id);
+
+  const allImages = React.useMemo<string[]>(() => {
+    if (!product) return [];
+    const list = [product.image, ...(product.images ?? [])].filter(Boolean);
+    // de-dupe while preserving order
+    return Array.from(new Set(list));
+  }, [product]);
+  const [activeImage, setActiveImage] = React.useState(0);
+  React.useEffect(() => setActiveImage(0), [id]);
 
   const related = React.useMemo<Product[]>(() => {
     if (!product || products.length <= 1) return [];
