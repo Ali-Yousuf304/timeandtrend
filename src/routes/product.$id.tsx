@@ -105,12 +105,38 @@ function ProductPage() {
       </Link>
 
       <div className="grid gap-10 md:grid-cols-2">
-        <div className="flex aspect-square items-center justify-center rounded-xl bg-muted p-12">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="max-h-full max-w-full object-contain"
-          />
+        <div className="space-y-3">
+          <div className="flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-muted p-12">
+            <img
+              src={allImages[activeImage] ?? product.image}
+              alt={product.name}
+              className="max-h-full max-w-full object-contain"
+            />
+          </div>
+          {allImages.length > 1 && (
+            <div className="flex flex-wrap gap-2">
+              {allImages.map((img, idx) => (
+                <button
+                  key={img + idx}
+                  type="button"
+                  onClick={() => setActiveImage(idx)}
+                  className={cn(
+                    "h-20 w-20 overflow-hidden rounded-md border-2 bg-muted p-1 transition-all",
+                    activeImage === idx
+                      ? "border-[var(--gold)]"
+                      : "border-transparent hover:border-border",
+                  )}
+                  aria-label={`View image ${idx + 1}`}
+                >
+                  <img
+                    src={img}
+                    alt=""
+                    className="h-full w-full object-contain"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col">
@@ -196,6 +222,25 @@ function ProductPage() {
               />
             </Button>
           </div>
+
+          {settings?.whatsapp_number && settings.whatsapp_enabled !== false && (
+            <a
+              href={(() => {
+                const digits = settings.whatsapp_number!.replace(/[^\d]/g, "");
+                const url = typeof window !== "undefined" ? window.location.href : "";
+                const text = `Hi! I'd like to order *${product.name}* (Rs. ${product.price.toLocaleString()}) — ${url}`;
+                return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`;
+              })()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-md bg-[#25D366] px-6 py-3 text-base font-semibold text-white shadow-sm transition-colors hover:bg-[#20bd5a]"
+            >
+              <svg viewBox="0 0 32 32" className="h-5 w-5" fill="currentColor" aria-hidden="true">
+                <path d="M16.001 3C9.373 3 4 8.373 4 15c0 2.385.696 4.605 1.893 6.476L4 29l7.71-1.852A11.94 11.94 0 0 0 16.001 27C22.628 27 28 21.627 28 15S22.628 3 16.001 3Zm5.39 14.478c-.295-.148-1.747-.862-2.018-.96-.27-.099-.467-.148-.665.148-.197.295-.762.96-.935 1.158-.172.197-.345.222-.64.074-.295-.148-1.246-.459-2.373-1.464-.877-.782-1.469-1.748-1.642-2.043-.172-.295-.018-.454.13-.601.133-.132.295-.345.443-.517.148-.173.197-.296.295-.493.099-.197.05-.37-.025-.518-.074-.148-.665-1.604-.911-2.197-.24-.577-.485-.499-.665-.508l-.566-.01a1.09 1.09 0 0 0-.79.37c-.27.296-1.034 1.01-1.034 2.464 0 1.453 1.058 2.857 1.206 3.054.148.197 2.083 3.182 5.05 4.46.706.305 1.256.487 1.685.624.708.225 1.353.193 1.863.117.568-.085 1.747-.713 1.994-1.402.246-.69.246-1.28.172-1.402-.073-.123-.27-.197-.566-.345Z" />
+              </svg>
+              Order on WhatsApp
+            </a>
+          )}
         </div>
       </div>
 
@@ -209,16 +254,19 @@ function ProductPage() {
             </span>
           )}
         </h2>
-        <div className="mt-6 grid gap-8 md:grid-cols-[1fr_400px]">
+        <div className="mt-6">
+          <ReviewSummary
+            productId={product.id}
+            reviews={reviews}
+            onReviewSubmitted={reload}
+          />
+        </div>
+        <div className="mt-8">
           <ReviewList
             reviews={reviews}
             loading={reviewsLoading}
             empty="No reviews yet. Be the first to review!"
           />
-          <div>
-            <h3 className="mb-3 text-sm font-semibold">Write a review</h3>
-            <ReviewForm productId={product.id} onSubmitted={reload} />
-          </div>
         </div>
       </div>
 
