@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { User as UserIcon, Heart, Package, LogOut, Shield, LogIn, Star } from "lucide-react";
+import { User as UserIcon, Heart, Package, LogOut, Shield, LogIn, Star, Mail } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import {
   DropdownMenu,
@@ -60,6 +60,11 @@ export function UserMenu() {
         <DropdownMenuItem asChild>
           <Link to="/account" search={{ tab: "reviews" }}>
             <Star className="h-4 w-4" /> My Reviews
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/account" search={{ tab: "queries" }}>
+            <Mail className="h-4 w-4" /> My Queries
           </Link>
         </DropdownMenuItem>
         {isAdmin && (

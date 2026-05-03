@@ -7,15 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Package, Star, Trash2 } from "lucide-react";
+import { Package, Star, Trash2, Mail } from "lucide-react";
 import { useUserReviews } from "@/hooks/use-reviews";
+import { MyQueries } from "@/components/site/MyQueries";
 
-type AccountTab = "profile" | "address" | "orders" | "reviews";
+type AccountTab = "profile" | "address" | "orders" | "reviews" | "queries";
 
 export const Route = createFileRoute("/account")({
   validateSearch: (search: Record<string, unknown>): { tab?: AccountTab } => {
     const t = search.tab;
-    if (t === "profile" || t === "address" || t === "orders" || t === "reviews") {
+    if (t === "profile" || t === "address" || t === "orders" || t === "reviews" || t === "queries") {
       return { tab: t };
     }
     return {};
@@ -121,6 +122,7 @@ function AccountPage() {
           <TabsTrigger value="address">Address</TabsTrigger>
           <TabsTrigger value="orders">Orders</TabsTrigger>
           <TabsTrigger value="reviews">My Reviews</TabsTrigger>
+          <TabsTrigger value="queries">My Queries</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile">
@@ -275,6 +277,10 @@ function AccountPage() {
 
         <TabsContent value="reviews">
           <UserReviewsTab userId={user.id} />
+        </TabsContent>
+
+        <TabsContent value="queries">
+          <MyQueries userId={user.id} />
         </TabsContent>
       </Tabs>
     </div>

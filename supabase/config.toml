@@ -2,3 +2,6 @@ project_id = "shdyfdtlusqlwugxvgeg"
 
 [functions.send-email]
 verify_jwt = false
+
+[functions.admin-assistant]
+verify_jwt = true

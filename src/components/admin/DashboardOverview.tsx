@@ -9,6 +9,13 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 
 type RangeKey = "today" | "yesterday" | "7d" | "30d" | "90d" | "all";
@@ -197,59 +204,32 @@ export function DashboardOverview() {
           ))}
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-          {[
-            {
-              label: "Total Sales",
-              value: `Rs. ${stats.sales.toLocaleString()}`,
-              icon: DollarSign,
-              tone: "text-[var(--gold)]",
-            },
-            {
-              label: "Orders",
-              value: stats.orderCount.toString(),
-              icon: ShoppingBag,
-              tone: "text-foreground",
-            },
-            {
-              label: "Pending Orders",
-              value: stats.pendingOrders.toString(),
-              icon: TrendingUp,
-              tone: "text-foreground",
-            },
-            {
-              label: "Visitors (Page Views)",
-              value: stats.pageViews.toLocaleString(),
-              icon: Eye,
-              tone: "text-foreground",
-            },
-            {
-              label: "Add to Cart",
-              value: stats.addToCartCount.toLocaleString(),
-              icon: ShoppingCart,
-              tone: "text-foreground",
-            },
-            {
-              label: "Active Products",
-              value: stats.activeProducts.toString(),
-              icon: Package,
-              tone: "text-foreground",
-            },
-          ].map((c) => (
-            <div
-              key={c.label}
-              className="rounded-lg border border-border bg-card p-5 shadow-sm"
-            >
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  {c.label}
-                </p>
-                <c.icon className={`h-5 w-5 ${c.tone}`} />
-              </div>
-              <p className={`mt-3 font-display text-2xl font-bold ${c.tone}`}>{c.value}</p>
-            </div>
-          ))}
-        </div>
+        <Carousel opts={{ align: "start" }} className="w-full">
+          <CarouselContent>
+            {[
+              { label: "Total Sales", value: `Rs. ${stats.sales.toLocaleString()}`, icon: DollarSign, tone: "text-[var(--gold)]" },
+              { label: "Orders", value: stats.orderCount.toString(), icon: ShoppingBag, tone: "text-foreground" },
+              { label: "Pending Orders", value: stats.pendingOrders.toString(), icon: TrendingUp, tone: "text-foreground" },
+              { label: "Visitors (Page Views)", value: stats.pageViews.toLocaleString(), icon: Eye, tone: "text-foreground" },
+              { label: "Add to Cart", value: stats.addToCartCount.toLocaleString(), icon: ShoppingCart, tone: "text-foreground" },
+              { label: "Active Products", value: stats.activeProducts.toString(), icon: Package, tone: "text-foreground" },
+            ].map((c) => (
+              <CarouselItem key={c.label} className="basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4">
+                <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                      {c.label}
+                    </p>
+                    <c.icon className={`h-5 w-5 ${c.tone}`} />
+                  </div>
+                  <p className={`mt-3 font-display text-2xl font-bold ${c.tone}`}>{c.value}</p>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
       )}
 
       {/* Top products */}

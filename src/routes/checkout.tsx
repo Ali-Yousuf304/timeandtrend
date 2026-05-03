@@ -11,6 +11,7 @@ import { useSiteSettings } from "@/hooks/use-settings";
 import { validatePromoCode, type ValidatedPromo } from "@/hooks/use-discounts";
 import { toast } from "sonner";
 import { Tag, X } from "lucide-react";
+import { sendEmail, getAdminEmails } from "@/lib/email";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -136,6 +137,9 @@ function CheckoutPage() {
         user_id: user.id,
         subtotal,
         total,
+        shipping_amount: shippingCost,
+        payment_method: paymentMethod,
+        customer_email: user.email ?? null,
         promo_code: promo?.code ?? null,
         discount_amount: promo?.discountAmount ?? 0,
         ...form,
@@ -168,6 +172,30 @@ function CheckoutPage() {
     if (promo) {
       await supabase.rpc("increment_discount_usage", { _code: promo.code });
     }
+
+    // Fire-and-forget emails
+    const orderPayload = {
+      id: order.id,
+      total,
+      subtotal,
+      shipping_amount: shippingCost,
+      shipping_name: form.shipping_name,
+      shipping_address_line1: form.shipping_address_line1,
+      shipping_city: form.shipping_city,
+      shipping_country: form.shipping_country,
+      shipping_phone: form.shipping_phone,
+      payment_method: paymentMethod,
+      customer_email: user.email,
+      items: items.map((i) => ({
+        product_name: i.product.name,
+        quantity: i.quantity,
+        unit_price: i.product.price,
+      })),
+    };
+    if (user.email) sendEmail("order_confirmation", user.email, orderPayload);
+    getAdminEmails().then((admins) => {
+      if (admins.length) sendEmail("admin_new_order", admins, orderPayload);
+    });
 
     items.forEach((i) => remove(i.product.id));
     toast.success("Order placed!");

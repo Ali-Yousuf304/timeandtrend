@@ -11,6 +11,8 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { Toaster } from "@/components/ui/sonner";
 import { WhatsAppButton } from "@/components/site/WhatsAppButton";
 import { PageViewTracker } from "@/components/site/PageViewTracker";
+import { PromoBar } from "@/components/site/PromoBar";
+import { AdminAssistant } from "@/components/admin/AdminAssistant";
 
 function NotFoundComponent() {
   return (
@@ -97,6 +99,7 @@ function RootComponent() {
           <CartProvider>
             <div className="flex min-h-screen flex-col">
               <PageViewTracker />
+              <PromoBar />
               <Header />
               <main className="flex-1">
                 <Outlet />
@@ -104,6 +107,7 @@ function RootComponent() {
               <Footer />
               <CartPanel />
               <WhatsAppButton />
+              <AdminAssistant />
               <Toaster />
             </div>
           </CartProvider>
