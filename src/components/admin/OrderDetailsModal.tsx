@@ -57,8 +57,102 @@ const FULFILLMENT_STATUSES = ["unfulfilled", "fulfilled", "shipped", "delivered"
 export function OrderDetailsModal({ order, onClose, onUpdated }: Props) {
   const [updatingPay, setUpdatingPay] = React.useState(false);
   const [updatingFulfill, setUpdatingFulfill] = React.useState(false);
+  const [shipping, setShipping] = React.useState(false);
 
   if (!order) return null;
+
+  async function shipWithPostEx() {
+    if (!order) return;
+    setShipping(true);
+    const { data: sess } = await supabase.auth.getSession();
+    const token = sess.session?.access_token;
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/postex-create-shipment`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({ orderId: order.id }),
+        },
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error ?? "Failed to create PostEx shipment");
+      } else {
+        toast.success(
+          data.alreadyShipped
+            ? `Already shipped — ${data.trackingNumber}`
+            : `Shipment created — ${data.trackingNumber}`,
+        );
+        onUpdated();
+      }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setShipping(false);
+    }
+  }
+
+  function printLabel() {
+    if (!order?.postex_tracking_number) return;
+    const itemsHtml = order.order_items
+      .map(
+        (it) =>
+          `<tr><td>${escapeHtml(it.product_name)}</td><td style="text-align:center">${it.quantity}</td></tr>`,
+      )
+      .join("");
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>Shipping Label ${order.postex_tracking_number}</title>
+<style>
+  body{font-family:Arial,sans-serif;padding:24px;color:#000}
+  .label{border:2px solid #000;padding:20px;max-width:520px;margin:auto}
+  h1{font-size:22px;margin:0 0 8px}
+  .tracking{font-size:28px;font-weight:bold;letter-spacing:2px;text-align:center;border:2px dashed #000;padding:12px;margin:12px 0}
+  .row{display:flex;justify-content:space-between;gap:16px;font-size:13px;margin-top:6px}
+  .box{border:1px solid #000;padding:10px;margin-top:10px}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
+  th,td{border:1px solid #000;padding:4px 6px}
+  .small{font-size:11px;color:#333}
+  @media print{button{display:none}}
+</style></head><body>
+<div class="label">
+  <h1>PostEx Shipping Label</h1>
+  <div class="small">Order #${order.id.slice(0, 8).toUpperCase()} — ${new Date(order.created_at).toLocaleString()}</div>
+  <div class="tracking">${order.postex_tracking_number}</div>
+  <div class="box">
+    <strong>Deliver To</strong><br/>
+    ${escapeHtml(order.shipping_name ?? "")}<br/>
+    ${escapeHtml(order.shipping_address_line1 ?? "")}${order.shipping_address_line2 ? ", " + escapeHtml(order.shipping_address_line2) : ""}<br/>
+    ${escapeHtml(order.shipping_city ?? "")}${order.shipping_state ? ", " + escapeHtml(order.shipping_state) : ""} ${escapeHtml(order.shipping_postal_code ?? "")}<br/>
+    ${escapeHtml(order.shipping_country ?? "")}<br/>
+    Phone: ${escapeHtml(order.shipping_phone ?? "—")}
+  </div>
+  <div class="row">
+    <div><strong>Payment:</strong> ${escapeHtml(order.payment_method ?? "COD").toUpperCase()}</div>
+    <div><strong>COD Amount:</strong> Rs. ${
+      ((order.payment_method ?? "cod").toLowerCase() === "cod" && order.payment_status !== "paid"
+        ? Number(order.total)
+        : 0
+      ).toLocaleString()
+    }</div>
+  </div>
+  <table><thead><tr><th>Item</th><th>Qty</th></tr></thead><tbody>${itemsHtml}</tbody></table>
+  <p class="small" style="margin-top:14px">Total: Rs. ${Number(order.total).toLocaleString()}</p>
+</div>
+<button onclick="window.print()" style="display:block;margin:16px auto;padding:10px 20px;font-size:14px">Print</button>
+<script>setTimeout(()=>window.print(),300)</script>
+</body></html>`;
+    const w = window.open("", "_blank", "width=720,height=900");
+    if (!w) {
+      toast.error("Pop-up blocked. Allow pop-ups to print the label.");
+      return;
+    }
+    w.document.write(html);
+    w.document.close();
+  }
 
   async function updatePayment(value: string) {
     if (!order) return;
