@@ -36,6 +36,7 @@ export interface AdminOrderFull {
   shipping_country: string | null;
   shipping_phone: string | null;
   created_at: string;
+  postex_tracking_number: string | null;
   order_items: {
     product_name: string;
     product_image: string | null;
