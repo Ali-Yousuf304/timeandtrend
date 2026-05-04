@@ -71,6 +71,8 @@ export function SettingsAdmin() {
   const [flatRate, setFlatRate] = React.useState("");
   const [freeThreshold, setFreeThreshold] = React.useState("");
   const [note, setNote] = React.useState("");
+  const [postexKey, setPostexKey] = React.useState("");
+  const [postexPickup, setPostexPickup] = React.useState("");
 
   // WhatsApp
   const [whatsapp, setWhatsapp] = React.useState("");
