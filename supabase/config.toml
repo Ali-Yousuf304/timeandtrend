@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.admin-assistant]
 verify_jwt = true
+
+[functions.postex-create-shipment]
+verify_jwt = true
