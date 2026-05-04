@@ -285,6 +285,8 @@ export type Database = {
           id: string
           payment_method: string | null
           payment_status: string
+          postex_shipment_data: Json | null
+          postex_tracking_number: string | null
           promo_code: string | null
           shipping_address_line1: string | null
           shipping_address_line2: string | null
@@ -309,6 +311,8 @@ export type Database = {
           id?: string
           payment_method?: string | null
           payment_status?: string
+          postex_shipment_data?: Json | null
+          postex_tracking_number?: string | null
           promo_code?: string | null
           shipping_address_line1?: string | null
           shipping_address_line2?: string | null
@@ -333,6 +337,8 @@ export type Database = {
           id?: string
           payment_method?: string | null
           payment_status?: string
+          postex_shipment_data?: Json | null
+          postex_tracking_number?: string | null
           promo_code?: string | null
           shipping_address_line1?: string | null
           shipping_address_line2?: string | null
@@ -533,6 +539,8 @@ export type Database = {
           id: string
           logo_url: string | null
           payment_methods: Json
+          postex_api_key: string | null
+          postex_pickup_address_code: string | null
           shipping_flat_rate: number
           shipping_free_threshold: number
           shipping_note: string | null
@@ -550,6 +558,8 @@ export type Database = {
           id?: string
           logo_url?: string | null
           payment_methods?: Json
+          postex_api_key?: string | null
+          postex_pickup_address_code?: string | null
           shipping_flat_rate?: number
           shipping_free_threshold?: number
           shipping_note?: string | null
@@ -567,6 +577,8 @@ export type Database = {
           id?: string
           logo_url?: string | null
           payment_methods?: Json
+          postex_api_key?: string | null
+          postex_pickup_address_code?: string | null
           shipping_flat_rate?: number
           shipping_free_threshold?: number
           shipping_note?: string | null
