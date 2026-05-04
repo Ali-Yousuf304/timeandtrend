@@ -71,6 +71,8 @@ export function SettingsAdmin() {
   const [flatRate, setFlatRate] = React.useState("");
   const [freeThreshold, setFreeThreshold] = React.useState("");
   const [note, setNote] = React.useState("");
+  const [postexKey, setPostexKey] = React.useState("");
+  const [postexPickup, setPostexPickup] = React.useState("");
 
   // WhatsApp
   const [whatsapp, setWhatsapp] = React.useState("");
@@ -92,6 +94,8 @@ export function SettingsAdmin() {
       setFlatRate(String(settings.shipping_flat_rate));
       setFreeThreshold(String(settings.shipping_free_threshold));
       setNote(settings.shipping_note ?? "");
+      setPostexKey(settings.postex_api_key ?? "");
+      setPostexPickup(settings.postex_pickup_address_code ?? "");
       setWhatsapp(settings.whatsapp_number ?? "");
       setWhatsappEnabled(settings.whatsapp_enabled);
       setSocial(settings.social_links);
@@ -411,6 +415,35 @@ export function SettingsAdmin() {
                   rows={2}
                 />
               </div>
+              <div className="border-t border-border pt-4">
+                <h4 className="font-semibold">PostEx Pakistan (Courier)</h4>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Required to ship orders via PostEx from each order's details panel.
+                </p>
+                <div className="mt-3 grid gap-4 md:grid-cols-2">
+                  <div>
+                    <Label htmlFor="postex-key">PostEx API key (token)</Label>
+                    <Input
+                      id="postex-key"
+                      type="password"
+                      autoComplete="off"
+                      value={postexKey}
+                      onChange={(e) => setPostexKey(e.target.value)}
+                      placeholder="Paste PostEx API token"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="postex-pickup">Pickup address code</Label>
+                    <Input
+                      id="postex-pickup"
+                      value={postexPickup}
+                      onChange={(e) => setPostexPickup(e.target.value)}
+                      placeholder="e.g. 001"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <Button
                 onClick={() =>
                   update(
@@ -418,6 +451,8 @@ export function SettingsAdmin() {
                       shipping_flat_rate: Number(flatRate) || 0,
                       shipping_free_threshold: Number(freeThreshold) || 0,
                       shipping_note: note || null,
+                      postex_api_key: postexKey.trim() || null,
+                      postex_pickup_address_code: postexPickup.trim() || null,
                     },
                     "Shipping settings updated",
                   )

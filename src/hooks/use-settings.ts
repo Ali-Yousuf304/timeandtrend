@@ -40,6 +40,8 @@ export interface SiteSettings {
   contact_phone: string | null;
   contact_address: string | null;
   social_links: SocialLinks;
+  postex_api_key: string | null;
+  postex_pickup_address_code: string | null;
 }
 
 export function useSiteSettings() {
@@ -64,6 +66,8 @@ export function useSiteSettings() {
         contact_phone?: string | null;
         contact_address?: string | null;
         social_links?: unknown;
+        postex_api_key?: string | null;
+        postex_pickup_address_code?: string | null;
       };
       setSettings({
         id: row.id,
@@ -82,6 +86,8 @@ export function useSiteSettings() {
           ...defaultSocialLinks,
           ...((row.social_links as Partial<SocialLinks>) ?? {}),
         },
+        postex_api_key: row.postex_api_key ?? null,
+        postex_pickup_address_code: row.postex_pickup_address_code ?? null,
       });
     }
     setLoading(false);
