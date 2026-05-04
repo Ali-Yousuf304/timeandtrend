@@ -94,6 +94,8 @@ export function SettingsAdmin() {
       setFlatRate(String(settings.shipping_flat_rate));
       setFreeThreshold(String(settings.shipping_free_threshold));
       setNote(settings.shipping_note ?? "");
+      setPostexKey(settings.postex_api_key ?? "");
+      setPostexPickup(settings.postex_pickup_address_code ?? "");
       setWhatsapp(settings.whatsapp_number ?? "");
       setWhatsappEnabled(settings.whatsapp_enabled);
       setSocial(settings.social_links);
