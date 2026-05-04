@@ -250,7 +250,45 @@ export function OrderDetailsModal({ order, onClose, onUpdated }: Props) {
             </div>
           </div>
 
-          {/* Items */}
+          {/* PostEx shipping */}
+          <div className="rounded-lg border border-border bg-muted/20 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold">PostEx Courier</p>
+                {order.postex_tracking_number ? (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Tracking #
+                    <span className="ml-1 font-mono text-foreground">
+                      {order.postex_tracking_number}
+                    </span>
+                  </p>
+                ) : (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Create a shipment to get a tracking number and label.
+                  </p>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {!order.postex_tracking_number && (
+                  <Button
+                    onClick={shipWithPostEx}
+                    disabled={shipping}
+                    className="bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"
+                  >
+                    <Truck className="mr-1.5 h-4 w-4" />
+                    {shipping ? "Creating…" : "Ship with PostEx"}
+                  </Button>
+                )}
+                {order.postex_tracking_number && (
+                  <Button onClick={printLabel} variant="outline">
+                    <Printer className="mr-1.5 h-4 w-4" />
+                    Print Label
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div className="rounded-lg border border-border">
             <div className="border-b border-border bg-muted/30 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {order.order_items.length} item{order.order_items.length === 1 ? "" : "s"}
