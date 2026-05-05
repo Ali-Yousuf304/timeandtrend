@@ -320,6 +320,73 @@ export function SettingsAdmin() {
             </div>
           )}
 
+          {active === "orders" && (
+            <div className="space-y-4 rounded-lg border border-border bg-card p-5">
+              <h3 className="font-semibold">Order Numbering</h3>
+              <p className="text-xs text-muted-foreground">
+                New orders will be numbered sequentially starting from this value.
+                Prefix and suffix are optional and appear around the number (e.g.{" "}
+                <code>VIP-1000-A</code>).
+              </p>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                <div>
+                  <Label htmlFor="ord-prefix">Prefix (optional)</Label>
+                  <Input
+                    id="ord-prefix"
+                    value={orderPrefix}
+                    onChange={(e) => setOrderPrefix(e.target.value)}
+                    placeholder="VIP-"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="ord-next">Order number starts at</Label>
+                  <Input
+                    id="ord-next"
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={orderNext}
+                    onChange={(e) => setOrderNext(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="ord-suffix">Suffix (optional)</Label>
+                  <Input
+                    id="ord-suffix"
+                    value={orderSuffix}
+                    onChange={(e) => setOrderSuffix(e.target.value)}
+                    placeholder="e.g. -A"
+                  />
+                </div>
+              </div>
+
+              <p className="text-sm text-muted-foreground">
+                Preview:{" "}
+                <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-foreground">
+                  #{orderPrefix}{orderNext || "1000"}{orderSuffix}
+                </code>
+              </p>
+
+              <Button
+                onClick={() =>
+                  update(
+                    {
+                      order_number_prefix: orderPrefix,
+                      order_number_suffix: orderSuffix,
+                      order_number_next: Math.max(1, parseInt(orderNext) || 1000),
+                    },
+                    "Order numbering saved",
+                  )
+                }
+                disabled={saving}
+                className="bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"
+              >
+                {saving ? "Saving…" : "Save order numbering"}
+              </Button>
+            </div>
+          )}
+
           {active === "payment" && (
             <div className="rounded-lg border border-border bg-card p-5">
               <div className="mb-3 flex items-center justify-between">
