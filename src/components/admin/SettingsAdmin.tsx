@@ -17,6 +17,7 @@ import {
   Share2,
   Megaphone,
   GripVertical,
+  Hash,
 } from "lucide-react";
 import {
   useSiteSettings,
@@ -29,19 +30,21 @@ import { cn } from "@/lib/utils";
 
 type SettingsSection =
   | "general"
+  | "promo"
+  | "orders"
   | "payment"
   | "shipping"
   | "whatsapp"
-  | "social"
-  | "promo";
+  | "social";
 
 const sections: { id: SettingsSection; label: string; icon: typeof CreditCard }[] = [
   { id: "general", label: "General", icon: Building2 },
+  { id: "promo", label: "Promo Bar", icon: Megaphone },
+  { id: "orders", label: "Orders", icon: Hash },
   { id: "payment", label: "Payment", icon: CreditCard },
   { id: "shipping", label: "Shipping", icon: Truck },
-  { id: "whatsapp", label: "WhatsApp", icon: MessageCircle },
   { id: "social", label: "Social Media", icon: Share2 },
-  { id: "promo", label: "Promo Bar", icon: Megaphone },
+  { id: "whatsapp", label: "WhatsApp", icon: MessageCircle },
 ];
 
 const SOCIAL_KEYS: (keyof SocialLinks)[] = ["instagram", "facebook", "tiktok", "youtube"];
@@ -81,6 +84,11 @@ export function SettingsAdmin() {
   // Social
   const [social, setSocial] = React.useState<SocialLinks>(defaultSocialLinks);
 
+  // Order numbering
+  const [orderPrefix, setOrderPrefix] = React.useState("");
+  const [orderSuffix, setOrderSuffix] = React.useState("");
+  const [orderNext, setOrderNext] = React.useState("1000");
+
   const [saving, setSaving] = React.useState(false);
 
   React.useEffect(() => {
@@ -99,6 +107,9 @@ export function SettingsAdmin() {
       setWhatsapp(settings.whatsapp_number ?? "");
       setWhatsappEnabled(settings.whatsapp_enabled);
       setSocial(settings.social_links);
+      setOrderPrefix(settings.order_number_prefix ?? "");
+      setOrderSuffix(settings.order_number_suffix ?? "");
+      setOrderNext(String(settings.order_number_next ?? 1000));
     }
   }, [settings]);
 
@@ -305,6 +316,73 @@ export function SettingsAdmin() {
                 className="bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"
               >
                 {saving ? "Saving…" : "Save general settings"}
+              </Button>
+            </div>
+          )}
+
+          {active === "orders" && (
+            <div className="space-y-4 rounded-lg border border-border bg-card p-5">
+              <h3 className="font-semibold">Order Numbering</h3>
+              <p className="text-xs text-muted-foreground">
+                New orders will be numbered sequentially starting from this value.
+                Prefix and suffix are optional and appear around the number (e.g.{" "}
+                <code>VIP-1000-A</code>).
+              </p>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                <div>
+                  <Label htmlFor="ord-prefix">Prefix (optional)</Label>
+                  <Input
+                    id="ord-prefix"
+                    value={orderPrefix}
+                    onChange={(e) => setOrderPrefix(e.target.value)}
+                    placeholder="VIP-"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="ord-next">Order number starts at</Label>
+                  <Input
+                    id="ord-next"
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={orderNext}
+                    onChange={(e) => setOrderNext(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="ord-suffix">Suffix (optional)</Label>
+                  <Input
+                    id="ord-suffix"
+                    value={orderSuffix}
+                    onChange={(e) => setOrderSuffix(e.target.value)}
+                    placeholder="e.g. -A"
+                  />
+                </div>
+              </div>
+
+              <p className="text-sm text-muted-foreground">
+                Preview:{" "}
+                <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-foreground">
+                  #{orderPrefix}{orderNext || "1000"}{orderSuffix}
+                </code>
+              </p>
+
+              <Button
+                onClick={() =>
+                  update(
+                    {
+                      order_number_prefix: orderPrefix,
+                      order_number_suffix: orderSuffix,
+                      order_number_next: Math.max(1, parseInt(orderNext) || 1000),
+                    },
+                    "Order numbering saved",
+                  )
+                }
+                disabled={saving}
+                className="bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"
+              >
+                {saving ? "Saving…" : "Save order numbering"}
               </Button>
             </div>
           )}

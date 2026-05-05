@@ -89,6 +89,11 @@ Deno.serve(async (req) => {
     const transactionType = isCOD ? "COD" : "PREPAID";
     const codAmount = isCOD ? Number(order.total) : 0;
 
+    // PostEx v3 create-order — exact field names per official spec.
+    // Only `pickupAddressCode` is valid; there is no `storeAddressCode`.
+    const orderRefNumber =
+      (order.order_number as string | null) || order.id.slice(0, 12).toUpperCase();
+
     const payload = {
       cityName: order.shipping_city ?? "",
       customerName: order.shipping_name ?? "Customer",
@@ -101,13 +106,14 @@ Deno.serve(async (req) => {
       invoicePayment: codAmount,
       items: itemsCount || 1,
       orderDetail: itemsDescription || "Order",
-      orderRefNumber: order.id.slice(0, 12).toUpperCase(),
+      orderRefNumber,
       orderType: "Normal",
       pickupAddressCode,
-      storeAddressCode: pickupAddressCode,
-      transactionNotes: `Order #${order.id.slice(0, 8).toUpperCase()}`,
+      transactionNotes: `Order #${orderRefNumber}`,
       transactionType,
     };
+
+    console.log("PostEx payload:", JSON.stringify(payload));
 
     const postexRes = await fetch(
       "https://api.postex.pk/services/integration/api/order/v3/create-order",
@@ -122,14 +128,22 @@ Deno.serve(async (req) => {
     );
 
     const postexData = await postexRes.json().catch(() => ({}));
-    if (!postexRes.ok || postexData?.statusCode && String(postexData.statusCode) !== "200") {
+    console.log("PostEx response:", postexRes.status, JSON.stringify(postexData));
+
+    if (!postexRes.ok || (postexData?.statusCode && String(postexData.statusCode) !== "200")) {
       console.error("PostEx error:", postexData);
+      const upstreamMsg =
+        postexData?.statusMessage ||
+        postexData?.message ||
+        `PostEx API failed (${postexRes.status})`;
       return json(
         {
           error:
-            postexData?.statusMessage ||
-            postexData?.message ||
-            `PostEx API failed (${postexRes.status})`,
+            upstreamMsg === "INVALID MERCHANT STORE ADDRESS CODE"
+              ? `PostEx rejected pickup address code "${pickupAddressCode}". This code must match a pickup address registered in your PostEx merchant dashboard. Log in to PostEx → Pickup Addresses to see valid codes.`
+              : upstreamMsg,
+          upstreamMessage: upstreamMsg,
+          sentPayload: payload,
           details: postexData,
         },
         502,

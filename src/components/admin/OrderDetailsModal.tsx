@@ -16,6 +16,7 @@ import { Truck, Printer } from "lucide-react";
 
 export interface AdminOrderFull {
   id: string;
+  order_number: string | null;
   user_id: string;
   status: string;
   payment_status: string;
@@ -81,7 +82,16 @@ export function OrderDetailsModal({ order, onClose, onUpdated }: Props) {
       );
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error ?? "Failed to create PostEx shipment");
+        if (data.sentPayload) {
+          console.error("PostEx sent payload:", data.sentPayload);
+          console.error("PostEx response:", data.details);
+        }
+        toast.error(data.error ?? "Failed to create PostEx shipment", {
+          duration: 8000,
+          description: data.sentPayload
+            ? "Check browser console for the exact request payload sent to PostEx."
+            : undefined,
+        });
       } else {
         toast.success(
           data.alreadyShipped
@@ -120,7 +130,7 @@ export function OrderDetailsModal({ order, onClose, onUpdated }: Props) {
 </style></head><body>
 <div class="label">
   <h1>PostEx Shipping Label</h1>
-  <div class="small">Order #${order.id.slice(0, 8).toUpperCase()} — ${new Date(order.created_at).toLocaleString()}</div>
+  <div class="small">Order #${escapeHtml(order.order_number ?? order.id.slice(0, 8).toUpperCase())} — ${new Date(order.created_at).toLocaleString()}</div>
   <div class="tracking">${order.postex_tracking_number}</div>
   <div class="box">
     <strong>Deliver To</strong><br/>
@@ -188,7 +198,7 @@ export function OrderDetailsModal({ order, onClose, onUpdated }: Props) {
     <Dialog open={!!order} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
         <VisuallyHidden>
-          <DialogTitle>Order #{order.id.slice(0, 8)}</DialogTitle>
+          <DialogTitle>Order #{order.order_number ?? order.id.slice(0, 8)}</DialogTitle>
           <DialogDescription>Order details and status.</DialogDescription>
         </VisuallyHidden>
 
@@ -198,7 +208,7 @@ export function OrderDetailsModal({ order, onClose, onUpdated }: Props) {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="font-display text-xl font-bold">
-                  #{order.id.slice(0, 8).toUpperCase()}
+                  #{order.order_number ?? order.id.slice(0, 8).toUpperCase()}
                 </h2>
                 <PaymentBadge status={order.payment_status} />
                 <FulfillmentBadge status={order.fulfillment_status} />

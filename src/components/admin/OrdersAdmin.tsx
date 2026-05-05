@@ -57,7 +57,7 @@ export function OrdersAdmin() {
               {orders.map((o) => (
                 <tr key={o.id} className="hover:bg-muted/30">
                   <td className="px-4 py-3 font-mono text-xs">
-                    #{o.id.slice(0, 8).toUpperCase()}
+                    #{o.order_number ?? o.id.slice(0, 8).toUpperCase()}
                   </td>
                   <td className="px-4 py-3 text-xs text-muted-foreground">
                     {new Date(o.created_at).toLocaleString()}
@@ -95,7 +95,7 @@ export function OrdersAdmin() {
               <li key={o.id} className="space-y-2 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-mono text-xs">#{o.id.slice(0, 8).toUpperCase()}</p>
+                    <p className="font-mono text-xs">#{o.order_number ?? o.id.slice(0, 8).toUpperCase()}</p>
                     <p className="text-sm font-medium">{o.shipping_name ?? "—"}</p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(o.created_at).toLocaleString()}
