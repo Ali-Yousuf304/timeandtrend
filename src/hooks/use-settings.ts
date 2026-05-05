@@ -42,6 +42,9 @@ export interface SiteSettings {
   social_links: SocialLinks;
   postex_api_key: string | null;
   postex_pickup_address_code: string | null;
+  order_number_prefix: string;
+  order_number_suffix: string;
+  order_number_next: number;
 }
 
 export function useSiteSettings() {
