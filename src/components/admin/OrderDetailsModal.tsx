@@ -16,6 +16,7 @@ import { Truck, Printer } from "lucide-react";
 
 export interface AdminOrderFull {
   id: string;
+  order_number: string | null;
   user_id: string;
   status: string;
   payment_status: string;
