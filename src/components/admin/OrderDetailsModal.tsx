@@ -81,7 +81,16 @@ export function OrderDetailsModal({ order, onClose, onUpdated }: Props) {
       );
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error ?? "Failed to create PostEx shipment");
+        if (data.sentPayload) {
+          console.error("PostEx sent payload:", data.sentPayload);
+          console.error("PostEx response:", data.details);
+        }
+        toast.error(data.error ?? "Failed to create PostEx shipment", {
+          duration: 8000,
+          description: data.sentPayload
+            ? "Check browser console for the exact request payload sent to PostEx."
+            : undefined,
+        });
       } else {
         toast.success(
           data.alreadyShipped
