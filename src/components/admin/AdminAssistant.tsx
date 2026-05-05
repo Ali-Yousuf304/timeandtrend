@@ -29,12 +29,12 @@ export function AdminAssistant() {
   ]);
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
-  const onAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
-  if (!isAdmin || !onAdminRoute) return null;
-
   React.useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, open]);
+
+  const onAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
+  if (!isAdmin || !onAdminRoute) return null;
 
   async function send() {
     const text = input.trim();
