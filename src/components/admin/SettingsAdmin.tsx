@@ -84,6 +84,11 @@ export function SettingsAdmin() {
   // Social
   const [social, setSocial] = React.useState<SocialLinks>(defaultSocialLinks);
 
+  // Order numbering
+  const [orderPrefix, setOrderPrefix] = React.useState("");
+  const [orderSuffix, setOrderSuffix] = React.useState("");
+  const [orderNext, setOrderNext] = React.useState("1000");
+
   const [saving, setSaving] = React.useState(false);
 
   React.useEffect(() => {
