@@ -130,7 +130,7 @@ export function OrderDetailsModal({ order, onClose, onUpdated }: Props) {
 </style></head><body>
 <div class="label">
   <h1>PostEx Shipping Label</h1>
-  <div class="small">Order #${order.id.slice(0, 8).toUpperCase()} — ${new Date(order.created_at).toLocaleString()}</div>
+  <div class="small">Order #${escapeHtml(order.order_number ?? order.id.slice(0, 8).toUpperCase())} — ${new Date(order.created_at).toLocaleString()}</div>
   <div class="tracking">${order.postex_tracking_number}</div>
   <div class="box">
     <strong>Deliver To</strong><br/>
