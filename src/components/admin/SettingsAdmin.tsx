@@ -17,6 +17,7 @@ import {
   Share2,
   Megaphone,
   GripVertical,
+  Hash,
 } from "lucide-react";
 import {
   useSiteSettings,
@@ -29,19 +30,21 @@ import { cn } from "@/lib/utils";
 
 type SettingsSection =
   | "general"
+  | "promo"
+  | "orders"
   | "payment"
   | "shipping"
   | "whatsapp"
-  | "social"
-  | "promo";
+  | "social";
 
 const sections: { id: SettingsSection; label: string; icon: typeof CreditCard }[] = [
   { id: "general", label: "General", icon: Building2 },
+  { id: "promo", label: "Promo Bar", icon: Megaphone },
+  { id: "orders", label: "Orders", icon: Hash },
   { id: "payment", label: "Payment", icon: CreditCard },
   { id: "shipping", label: "Shipping", icon: Truck },
-  { id: "whatsapp", label: "WhatsApp", icon: MessageCircle },
   { id: "social", label: "Social Media", icon: Share2 },
-  { id: "promo", label: "Promo Bar", icon: Megaphone },
+  { id: "whatsapp", label: "WhatsApp", icon: MessageCircle },
 ];
 
 const SOCIAL_KEYS: (keyof SocialLinks)[] = ["instagram", "facebook", "tiktok", "youtube"];
