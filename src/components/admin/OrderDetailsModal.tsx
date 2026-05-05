@@ -198,7 +198,7 @@ export function OrderDetailsModal({ order, onClose, onUpdated }: Props) {
     <Dialog open={!!order} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
         <VisuallyHidden>
-          <DialogTitle>Order #{order.id.slice(0, 8)}</DialogTitle>
+          <DialogTitle>Order #{order.order_number ?? order.id.slice(0, 8)}</DialogTitle>
           <DialogDescription>Order details and status.</DialogDescription>
         </VisuallyHidden>
 
@@ -208,7 +208,7 @@ export function OrderDetailsModal({ order, onClose, onUpdated }: Props) {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="font-display text-xl font-bold">
-                  #{order.id.slice(0, 8).toUpperCase()}
+                  #{order.order_number ?? order.id.slice(0, 8).toUpperCase()}
                 </h2>
                 <PaymentBadge status={order.payment_status} />
                 <FulfillmentBadge status={order.fulfillment_status} />
