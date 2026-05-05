@@ -71,6 +71,9 @@ export function useSiteSettings() {
         social_links?: unknown;
         postex_api_key?: string | null;
         postex_pickup_address_code?: string | null;
+        order_number_prefix?: string | null;
+        order_number_suffix?: string | null;
+        order_number_next?: number | string | null;
       };
       setSettings({
         id: row.id,
@@ -91,6 +94,9 @@ export function useSiteSettings() {
         },
         postex_api_key: row.postex_api_key ?? null,
         postex_pickup_address_code: row.postex_pickup_address_code ?? null,
+        order_number_prefix: row.order_number_prefix ?? "",
+        order_number_suffix: row.order_number_suffix ?? "",
+        order_number_next: Number(row.order_number_next ?? 1000),
       });
     }
     setLoading(false);
