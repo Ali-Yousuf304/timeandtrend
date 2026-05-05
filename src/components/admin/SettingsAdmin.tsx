@@ -107,6 +107,9 @@ export function SettingsAdmin() {
       setWhatsapp(settings.whatsapp_number ?? "");
       setWhatsappEnabled(settings.whatsapp_enabled);
       setSocial(settings.social_links);
+      setOrderPrefix(settings.order_number_prefix ?? "");
+      setOrderSuffix(settings.order_number_suffix ?? "");
+      setOrderNext(String(settings.order_number_next ?? 1000));
     }
   }, [settings]);
 
