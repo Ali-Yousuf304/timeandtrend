@@ -283,6 +283,7 @@ export type Database = {
           discount_amount: number
           fulfillment_status: string
           id: string
+          order_number: string | null
           payment_method: string | null
           payment_status: string
           postex_shipment_data: Json | null
@@ -309,6 +310,7 @@ export type Database = {
           discount_amount?: number
           fulfillment_status?: string
           id?: string
+          order_number?: string | null
           payment_method?: string | null
           payment_status?: string
           postex_shipment_data?: Json | null
@@ -335,6 +337,7 @@ export type Database = {
           discount_amount?: number
           fulfillment_status?: string
           id?: string
+          order_number?: string | null
           payment_method?: string | null
           payment_status?: string
           postex_shipment_data?: Json | null
@@ -538,6 +541,9 @@ export type Database = {
           created_at: string
           id: string
           logo_url: string | null
+          order_number_next: number
+          order_number_prefix: string | null
+          order_number_suffix: string | null
           payment_methods: Json
           postex_api_key: string | null
           postex_pickup_address_code: string | null
@@ -557,6 +563,9 @@ export type Database = {
           created_at?: string
           id?: string
           logo_url?: string | null
+          order_number_next?: number
+          order_number_prefix?: string | null
+          order_number_suffix?: string | null
           payment_methods?: Json
           postex_api_key?: string | null
           postex_pickup_address_code?: string | null
@@ -576,6 +585,9 @@ export type Database = {
           created_at?: string
           id?: string
           logo_url?: string | null
+          order_number_next?: number
+          order_number_prefix?: string | null
+          order_number_suffix?: string | null
           payment_methods?: Json
           postex_api_key?: string | null
           postex_pickup_address_code?: string | null
@@ -637,6 +649,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      allocate_order_number: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
