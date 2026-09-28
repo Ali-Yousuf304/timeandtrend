@@ -6,6 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Trash2, Plus, Tag } from "lucide-react";
 import { toast } from "sonner";
 
@@ -33,11 +40,19 @@ export function DiscountsAdmin() {
   const { discounts, loading, reload } = useDiscounts();
   const [form, setForm] = React.useState<FormState>(empty);
   const [editingId, setEditingId] = React.useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
 
   function reset() {
     setForm(empty);
     setEditingId(null);
+    setDialogOpen(false);
+  }
+
+  function openCreate() {
+    setForm(empty);
+    setEditingId(null);
+    setDialogOpen(true);
   }
 
   function startEdit(d: Discount) {
@@ -51,6 +66,7 @@ export function DiscountsAdmin() {
       usage_limit: d.usage_limit !== null ? String(d.usage_limit) : "",
       active: d.active,
     });
+    setDialogOpen(true);
   }
 
   async function save(e: React.FormEvent) {
@@ -105,110 +121,136 @@ export function DiscountsAdmin() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="font-display text-2xl font-bold">Discounts & Promo Codes</h2>
-        <p className="text-sm text-muted-foreground">
-          Create promo codes that customers can apply at checkout for a discount.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h2 className="font-display text-2xl font-bold">Discounts & Promo Codes</h2>
+          <p className="text-sm text-muted-foreground">
+            Create promo codes that customers can apply at checkout for a discount.
+          </p>
+        </div>
+        <Button
+          type="button"
+          onClick={openCreate}
+          className="bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"
+        >
+          <Plus className="mr-1 h-4 w-4" />
+          Create Discount
+        </Button>
       </div>
 
-      <form
-        onSubmit={save}
-        className="grid gap-4 rounded-lg border border-border bg-card p-5 shadow-sm md:grid-cols-2"
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          if (open) setDialogOpen(true);
+          else reset();
+        }}
       >
-        <div>
-          <Label htmlFor="code">Code</Label>
-          <Input
-            id="code"
-            placeholder="SUMMER10"
-            value={form.code}
-            onChange={(e) => setForm({ ...form, code: e.target.value })}
-            required
-          />
-        </div>
-        <div>
-          <Label>Type</Label>
-          <Select
-            value={form.discount_type}
-            onValueChange={(v) =>
-              setForm({ ...form, discount_type: v as "percentage" | "fixed" })
-            }
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingId ? "Edit discount" : "Create discount"}</DialogTitle>
+            <DialogDescription>
+              {editingId
+                ? "Update the promo code details below."
+                : "Fill in the details to create a new promo code."}
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            onSubmit={save}
+            className="grid gap-4"
           >
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="percentage">Percentage (%)</SelectItem>
-              <SelectItem value="fixed">Fixed amount (Rs.)</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label htmlFor="value">
-            Value {form.discount_type === "percentage" ? "(%)" : "(Rs.)"}
-          </Label>
-          <Input
-            id="value"
-            type="number"
-            min="1"
-            step="1"
-            value={form.discount_value}
-            onChange={(e) => setForm({ ...form, discount_value: e.target.value })}
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="min">Minimum order (Rs.)</Label>
-          <Input
-            id="min"
-            type="number"
-            min="0"
-            value={form.min_order_amount}
-            onChange={(e) => setForm({ ...form, min_order_amount: e.target.value })}
-          />
-        </div>
-        <div>
-          <Label htmlFor="expires">Expires (optional)</Label>
-          <Input
-            id="expires"
-            type="date"
-            value={form.expires_at}
-            onChange={(e) => setForm({ ...form, expires_at: e.target.value })}
-          />
-        </div>
-        <div>
-          <Label htmlFor="limit">Usage limit (optional)</Label>
-          <Input
-            id="limit"
-            type="number"
-            min="1"
-            placeholder="Unlimited"
-            value={form.usage_limit}
-            onChange={(e) => setForm({ ...form, usage_limit: e.target.value })}
-          />
-        </div>
-        <div className="flex items-center gap-3 md:col-span-2">
-          <Switch
-            id="active"
-            checked={form.active}
-            onCheckedChange={(v) => setForm({ ...form, active: v })}
-          />
-          <Label htmlFor="active">Active</Label>
-        </div>
-        <div className="flex gap-2 md:col-span-2">
-          <Button
-            type="submit"
-            disabled={busy}
-            className="bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"
-          >
-            <Plus className="mr-1 h-4 w-4" />
-            {editingId ? "Update discount" : "Create discount"}
-          </Button>
-          {editingId && (
-            <Button type="button" variant="ghost" onClick={reset}>
-              Cancel
-            </Button>
-          )}
-        </div>
-      </form>
+            <div>
+              <Label htmlFor="code">Code</Label>
+              <Input
+                id="code"
+                placeholder="SUMMER10"
+                value={form.code}
+                onChange={(e) => setForm({ ...form, code: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label>Type</Label>
+              <Select
+                value={form.discount_type}
+                onValueChange={(v) =>
+                  setForm({ ...form, discount_type: v as "percentage" | "fixed" })
+                }
+              >
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="percentage">Percentage (%)</SelectItem>
+                  <SelectItem value="fixed">Fixed amount (Rs.)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="value">
+                Value {form.discount_type === "percentage" ? "(%)" : "(Rs.)"}
+              </Label>
+              <Input
+                id="value"
+                type="number"
+                min="1"
+                step="1"
+                value={form.discount_value}
+                onChange={(e) => setForm({ ...form, discount_value: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="min">Minimum order (Rs.)</Label>
+              <Input
+                id="min"
+                type="number"
+                min="0"
+                value={form.min_order_amount}
+                onChange={(e) => setForm({ ...form, min_order_amount: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="expires">Expires (optional)</Label>
+              <Input
+                id="expires"
+                type="date"
+                value={form.expires_at}
+                onChange={(e) => setForm({ ...form, expires_at: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="limit">Usage limit (optional)</Label>
+              <Input
+                id="limit"
+                type="number"
+                min="1"
+                placeholder="Unlimited"
+                value={form.usage_limit}
+                onChange={(e) => setForm({ ...form, usage_limit: e.target.value })}
+              />
+            </div>
+            <div className="flex items-center gap-3">
+              <Switch
+                id="active"
+                checked={form.active}
+                onCheckedChange={(v) => setForm({ ...form, active: v })}
+              />
+              <Label htmlFor="active">Active</Label>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="submit"
+                disabled={busy}
+                className="bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"
+              >
+                <Plus className="mr-1 h-4 w-4" />
+                {editingId ? "Update discount" : "Create discount"}
+              </Button>
+              <Button type="button" variant="ghost" onClick={reset}>
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {loading ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
