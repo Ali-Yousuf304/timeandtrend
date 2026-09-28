@@ -19,7 +19,7 @@ const tools = [
     function: {
       name: "list_orders",
       description:
-        "List orders with optional filters. Returns id, total, status, payment_status, fulfillment_status, customer name, created_at.",
+        "List orders with optional filters. Returns id, order_number (e.g. 'TT-1001'), total, status, payment_status, fulfillment_status, customer name, created_at.",
       parameters: {
         type: "object",
         properties: {
@@ -37,16 +37,23 @@ const tools = [
     function: {
       name: "update_orders_status",
       description:
-        "Update status / payment_status / fulfillment_status for one or more orders. Provide either order_ids (array of UUIDs) OR a numeric range using id_range_from/id_range_to which matches the SHORT id (first 8 chars).",
+        "Update status / payment_status / fulfillment_status for one or more orders. References like 'TT-1001', '#TT-1001' or '1001' are ORDER NUMBERS — use order_numbers. 8-character hex like 'B034E685' is a SHORT id — use id_short_prefixes. order_ids is ONLY for full UUIDs. When the user says 'Delivered and Paid', set status='delivered', fulfillment_status='delivered', payment_status='paid'.",
       parameters: {
         type: "object",
         properties: {
-          order_ids: { type: "array", items: { type: "string" } },
+          order_ids: { type: "array", items: { type: "string" }, description: "Full UUIDs only — never order numbers or short ids" },
+          order_numbers: {
+            type: "array",
+            items: { type: "string" },
+            description: "Order numbers like ['TT-1001', '#TT-1002', '1003'] — matched case-insensitively; bare numbers are expanded with the configured prefix/suffix",
+          },
           id_short_prefixes: {
             type: "array",
             items: { type: "string" },
-            description: "Match orders whose id starts with any of these short prefixes (e.g. ['1001','1002'])",
+            description: "8-char hex short ids like ['B034E685'] — matched case-insensitively against the start of the order UUID",
           },
+          number_range_from: { type: "number", description: "Start of a numeric order-number range, e.g. 1001 for '1001 to 1009'" },
+          number_range_to: { type: "number", description: "End of a numeric order-number range, e.g. 1009" },
           status: { type: "string" },
           payment_status: { type: "string" },
           fulfillment_status: { type: "string" },
@@ -155,7 +162,7 @@ const tools = [
 async function callTool(name: string, args: any, db: any) {
   switch (name) {
     case "list_orders": {
-      let q = db.from("orders").select("id,total,status,payment_status,fulfillment_status,shipping_name,created_at");
+      let q = db.from("orders").select("id,order_number,total,status,payment_status,fulfillment_status,shipping_name,created_at");
       if (args.status) q = q.eq("status", args.status);
       if (args.payment_status) q = q.eq("payment_status", args.payment_status);
       if (args.fulfillment_status) q = q.eq("fulfillment_status", args.fulfillment_status);
@@ -177,19 +184,58 @@ async function callTool(name: string, args: any, db: any) {
       if (Object.keys(update).length === 0) return { error: "No fields to update" };
 
       let ids: string[] = args.order_ids ?? [];
+      const notFound: string[] = [];
+
+      const clean = (s: string) => String(s).trim().replace(/^#+/, "").trim();
+
+      // Short-id prefixes: case-insensitive, "#" stripped
       if (args.id_short_prefixes?.length) {
+        const prefixes = args.id_short_prefixes.map((p: string) => clean(p).toLowerCase());
         const { data } = await db.from("orders").select("id");
         const matches = (data ?? [])
           .filter((o: any) =>
-            args.id_short_prefixes.some((p: string) => o.id.startsWith(p)),
+            prefixes.some((p: string) => o.id.toLowerCase().startsWith(p)),
           )
           .map((o: any) => o.id);
         ids = [...ids, ...matches];
       }
-      if (!ids.length) return { error: "No orders matched" };
+
+      // Order numbers: expand numeric ranges, then resolve against order_number
+      const numberRefs: string[] = [...(args.order_numbers ?? [])];
+      if (args.number_range_from != null && args.number_range_to != null) {
+        for (let n = args.number_range_from; n <= args.number_range_to; n++) {
+          numberRefs.push(String(n));
+        }
+      }
+      if (numberRefs.length) {
+        const { data: settings } = await db
+          .from("site_settings")
+          .select("order_number_prefix,order_number_suffix")
+          .order("created_at", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+        const prefix = settings?.order_number_prefix ?? "";
+        const suffix = settings?.order_number_suffix ?? "";
+
+        const { data: allOrders } = await db.from("orders").select("id,order_number");
+        const byNumber = new Map<string, string>();
+        for (const o of allOrders ?? []) {
+          if (o.order_number) byNumber.set(String(o.order_number).toLowerCase(), o.id);
+        }
+        for (const ref of numberRefs) {
+          const c = clean(ref);
+          let hit = byNumber.get(c.toLowerCase());
+          if (!hit) hit = byNumber.get(`${prefix}${c}${suffix}`.toLowerCase());
+          if (hit) ids.push(hit);
+          else notFound.push(ref);
+        }
+      }
+
+      ids = [...new Set(ids)];
+      if (!ids.length) return { error: "No orders matched", not_found: notFound };
       const { error, count } = await db.from("orders").update(update).in("id", ids).select("id", { count: "exact" });
       if (error) return { error: error.message };
-      return { updated: count ?? ids.length };
+      return { updated: count ?? ids.length, not_found: notFound.length ? notFound : undefined };
     }
     case "create_discount": {
       const { data, error } = await db.from("discounts").insert({
@@ -306,7 +352,7 @@ serve(async (req) => {
 
     const { messages } = await req.json();
 
-    const systemPrompt = `You are an admin assistant for the Time & Trend e-commerce store. You can perform DB operations via tools. Be concise. After each operation, summarize what was done in 1-2 sentences. If the user's intent is unclear or destructive (delete, bulk update many records), confirm before acting. When the user mentions order numbers like "1001 to 1009", treat them as short id prefixes. Today is ${new Date().toISOString().slice(0, 10)}.`;
+    const systemPrompt = `You are an admin assistant for the Time & Trend e-commerce store. You can perform DB operations via tools. Be concise. After each operation, summarize what was done in 1-2 sentences. If the user's intent is unclear or destructive (delete, bulk update many records), confirm before acting. Order references like 'TT-1001', '#TT-1001' or '1001' are ORDER NUMBERS — pass them to update_orders_status via order_numbers (ranges like '1001 to 1009' via number_range_from/number_range_to). 8-character hex like 'B034E685' is a SHORT id — use id_short_prefixes. NEVER put order numbers or short ids into order_ids; that array is for full UUIDs only. When the user says 'Delivered and Paid', set status='delivered', fulfillment_status='delivered', payment_status='paid'. If a tool result includes not_found, mention those references in your reply. Today is ${new Date().toISOString().slice(0, 10)}.`;
 
     const conversation: any[] = [
       { role: "system", content: systemPrompt },
