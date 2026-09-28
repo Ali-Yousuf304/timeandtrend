@@ -162,7 +162,7 @@ const tools = [
 async function callTool(name: string, args: any, db: any) {
   switch (name) {
     case "list_orders": {
-      let q = db.from("orders").select("id,total,status,payment_status,fulfillment_status,shipping_name,created_at");
+      let q = db.from("orders").select("id,order_number,total,status,payment_status,fulfillment_status,shipping_name,created_at");
       if (args.status) q = q.eq("status", args.status);
       if (args.payment_status) q = q.eq("payment_status", args.payment_status);
       if (args.fulfillment_status) q = q.eq("fulfillment_status", args.fulfillment_status);
