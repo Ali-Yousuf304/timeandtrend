@@ -1,5 +1,3 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-export default defineConfig({
-    cloudflare: false,
-});
+export default defineConfig();
