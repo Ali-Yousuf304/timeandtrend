@@ -184,19 +184,58 @@ async function callTool(name: string, args: any, db: any) {
       if (Object.keys(update).length === 0) return { error: "No fields to update" };
 
       let ids: string[] = args.order_ids ?? [];
+      const notFound: string[] = [];
+
+      const clean = (s: string) => String(s).trim().replace(/^#+/, "").trim();
+
+      // Short-id prefixes: case-insensitive, "#" stripped
       if (args.id_short_prefixes?.length) {
+        const prefixes = args.id_short_prefixes.map((p: string) => clean(p).toLowerCase());
         const { data } = await db.from("orders").select("id");
         const matches = (data ?? [])
           .filter((o: any) =>
-            args.id_short_prefixes.some((p: string) => o.id.startsWith(p)),
+            prefixes.some((p: string) => o.id.toLowerCase().startsWith(p)),
           )
           .map((o: any) => o.id);
         ids = [...ids, ...matches];
       }
-      if (!ids.length) return { error: "No orders matched" };
+
+      // Order numbers: expand numeric ranges, then resolve against order_number
+      const numberRefs: string[] = [...(args.order_numbers ?? [])];
+      if (args.number_range_from != null && args.number_range_to != null) {
+        for (let n = args.number_range_from; n <= args.number_range_to; n++) {
+          numberRefs.push(String(n));
+        }
+      }
+      if (numberRefs.length) {
+        const { data: settings } = await db
+          .from("site_settings")
+          .select("order_number_prefix,order_number_suffix")
+          .order("created_at", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+        const prefix = settings?.order_number_prefix ?? "";
+        const suffix = settings?.order_number_suffix ?? "";
+
+        const { data: allOrders } = await db.from("orders").select("id,order_number");
+        const byNumber = new Map<string, string>();
+        for (const o of allOrders ?? []) {
+          if (o.order_number) byNumber.set(String(o.order_number).toLowerCase(), o.id);
+        }
+        for (const ref of numberRefs) {
+          const c = clean(ref);
+          let hit = byNumber.get(c.toLowerCase());
+          if (!hit) hit = byNumber.get(`${prefix}${c}${suffix}`.toLowerCase());
+          if (hit) ids.push(hit);
+          else notFound.push(ref);
+        }
+      }
+
+      ids = [...new Set(ids)];
+      if (!ids.length) return { error: "No orders matched", not_found: notFound };
       const { error, count } = await db.from("orders").update(update).in("id", ids).select("id", { count: "exact" });
       if (error) return { error: error.message };
-      return { updated: count ?? ids.length };
+      return { updated: count ?? ids.length, not_found: notFound.length ? notFound : undefined };
     }
     case "create_discount": {
       const { data, error } = await db.from("discounts").insert({
