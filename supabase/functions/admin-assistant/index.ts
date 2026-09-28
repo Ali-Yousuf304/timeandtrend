@@ -19,7 +19,7 @@ const tools = [
     function: {
       name: "list_orders",
       description:
-        "List orders with optional filters. Returns id, total, status, payment_status, fulfillment_status, customer name, created_at.",
+        "List orders with optional filters. Returns id, order_number (e.g. 'TT-1001'), total, status, payment_status, fulfillment_status, customer name, created_at.",
       parameters: {
         type: "object",
         properties: {
