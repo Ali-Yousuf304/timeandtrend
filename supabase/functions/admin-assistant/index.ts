@@ -37,16 +37,23 @@ const tools = [
     function: {
       name: "update_orders_status",
       description:
-        "Update status / payment_status / fulfillment_status for one or more orders. Provide either order_ids (array of UUIDs) OR a numeric range using id_range_from/id_range_to which matches the SHORT id (first 8 chars).",
+        "Update status / payment_status / fulfillment_status for one or more orders. References like 'TT-1001', '#TT-1001' or '1001' are ORDER NUMBERS — use order_numbers. 8-character hex like 'B034E685' is a SHORT id — use id_short_prefixes. order_ids is ONLY for full UUIDs. When the user says 'Delivered and Paid', set status='delivered', fulfillment_status='delivered', payment_status='paid'.",
       parameters: {
         type: "object",
         properties: {
-          order_ids: { type: "array", items: { type: "string" } },
+          order_ids: { type: "array", items: { type: "string" }, description: "Full UUIDs only — never order numbers or short ids" },
+          order_numbers: {
+            type: "array",
+            items: { type: "string" },
+            description: "Order numbers like ['TT-1001', '#TT-1002', '1003'] — matched case-insensitively; bare numbers are expanded with the configured prefix/suffix",
+          },
           id_short_prefixes: {
             type: "array",
             items: { type: "string" },
-            description: "Match orders whose id starts with any of these short prefixes (e.g. ['1001','1002'])",
+            description: "8-char hex short ids like ['B034E685'] — matched case-insensitively against the start of the order UUID",
           },
+          number_range_from: { type: "number", description: "Start of a numeric order-number range, e.g. 1001 for '1001 to 1009'" },
+          number_range_to: { type: "number", description: "End of a numeric order-number range, e.g. 1009" },
           status: { type: "string" },
           payment_status: { type: "string" },
           fulfillment_status: { type: "string" },
