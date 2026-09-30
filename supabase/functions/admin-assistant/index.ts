@@ -157,7 +157,50 @@ const tools = [
       },
     },
   },
+  ...[
+    ["list_customer_queries", "List customer queries (newest first).", { is_read: { type: "boolean" }, limit: { type: "number" } }],
+    ["reply_customer_query", "Reply to a customer query as admin and mark it read. Identify by query_id, or by query_email and/or query_name_contains (most recent match).", { query_id: { type: "string" }, query_email: { type: "string" }, query_name_contains: { type: "string" }, reply_message: { type: "string" } }, ["reply_message"]],
+    ["mark_customer_query_read", "Mark a customer query read/unread. Identify by query_id or query_email/query_name_contains.", { query_id: { type: "string" }, query_email: { type: "string" }, query_name_contains: { type: "string" }, is_read: { type: "boolean" } }],
+    ["list_collections", "List collections.", {}],
+    ["update_collection", "Update a collection by id, or name/slug match.", { id: { type: "string" }, name_or_slug: { type: "string" }, active: { type: "boolean" }, sort_order: { type: "number" }, name: { type: "string" } }],
+    ["list_banners", "List homepage banners.", {}],
+    ["update_banner", "Update a banner by id or title match.", { id: { type: "string" }, title_match: { type: "string" }, active: { type: "boolean" }, sort_order: { type: "number" }, title: { type: "string" }, subtitle: { type: "string" }, cta_label: { type: "string" }, cta_link: { type: "string" } }],
+    ["create_banner", "Create a banner. image (URL) is required.", { title: { type: "string" }, image: { type: "string" }, subtitle: { type: "string" }, cta_label: { type: "string" }, cta_link: { type: "string" }, active: { type: "boolean" }, sort_order: { type: "number" } }, ["title"]],
+    ["list_reviews", "List product reviews.", { enabled: { type: "boolean" }, product_name_contains: { type: "string" }, limit: { type: "number" } }],
+    ["update_review", "Enable/disable a review by id.", { id: { type: "string" }, enabled: { type: "boolean" } }, ["id"]],
+    ["delete_review", "Delete a review by id (destructive — confirm first).", { id: { type: "string" } }, ["id"]],
+    ["get_settings", "Get store settings.", {}],
+    ["update_settings", "Update store settings. Allowed fields: store_name, contact_email, contact_phone, contact_address, whatsapp_number, whatsapp_enabled, shipping_flat_rate, shipping_free_threshold, shipping_note, social_links, order_number_prefix, order_number_suffix, payment_methods.", { fields: { type: "object" } }, ["fields"]],
+    ["list_customers", "List customer profiles.", { email_contains: { type: "string" }, limit: { type: "number" } }],
+    ["list_promo_messages", "List promo bar messages.", {}],
+    ["update_promo_message", "Update a promo bar message by id.", { id: { type: "string" }, active: { type: "boolean" }, message: { type: "string" }, sort_order: { type: "number" } }, ["id"]],
+  ].map(([name, description, properties, required]: any) => ({
+    type: "function",
+    function: { name, description, parameters: { type: "object", properties, ...(required ? { required } : {}) } },
+  })),
 ];
+
+const SETTINGS_ALLOWED = [
+  "store_name", "contact_email", "contact_phone", "contact_address", "whatsapp_number", "whatsapp_enabled",
+  "shipping_flat_rate", "shipping_free_threshold", "shipping_note", "social_links",
+  "order_number_prefix", "order_number_suffix", "payment_methods",
+];
+
+async function resolveQueryId(args: any, db: any): Promise<string | null> {
+  if (args.query_id) return args.query_id;
+  if (!args.query_email && !args.query_name_contains) return null;
+  let q = db.from("customer_queries").select("id");
+  if (args.query_email) q = q.ilike("email", args.query_email.trim());
+  if (args.query_name_contains) q = q.ilike("name", `%${args.query_name_contains}%`);
+  const { data } = await q.order("created_at", { ascending: false }).limit(1);
+  return data?.[0]?.id ?? null;
+}
+
+const pick = (args: any, keys: string[]) => {
+  const o: any = {};
+  for (const k of keys) if (args[k] !== undefined) o[k] = args[k];
+  return o;
+};
 
 async function callTool(name: string, args: any, db: any) {
   switch (name) {
@@ -327,6 +370,143 @@ async function callTool(name: string, args: any, db: any) {
       const revenue = orders.filter((o: any) => o.status !== "cancelled").reduce((s: number, o: any) => s + Number(o.total), 0);
       return { window: w, revenue, order_count: orders.length };
     }
+    case "list_customer_queries": {
+      let q = db.from("customer_queries").select("id,name,email,message,is_read,created_at");
+      if (args.is_read !== undefined) q = q.eq("is_read", args.is_read);
+      const { data, error } = await q.order("created_at", { ascending: false }).limit(Math.min(args.limit ?? 20, 100));
+      if (error) return { error: error.message };
+      return { queries: data };
+    }
+    case "reply_customer_query": {
+      if (!args.reply_message) return { error: "reply_message is required" };
+      const qid = await resolveQueryId(args, db);
+      if (!qid) return { error: "Customer query not found" };
+      const { error } = await db.from("customer_query_replies").insert({ query_id: qid, author_role: "admin", message: args.reply_message });
+      if (error) return { error: error.message };
+      await db.from("customer_queries").update({ is_read: true }).eq("id", qid);
+      return { replied: true, query_id: qid };
+    }
+    case "mark_customer_query_read": {
+      const qid = await resolveQueryId(args, db);
+      if (!qid) return { error: "Customer query not found" };
+      const { error } = await db.from("customer_queries").update({ is_read: args.is_read ?? true }).eq("id", qid);
+      if (error) return { error: error.message };
+      return { query_id: qid, is_read: args.is_read ?? true };
+    }
+    case "list_collections": {
+      const { data, error } = await db.from("collections").select("id,name,slug,kind,active,sort_order").order("sort_order");
+      if (error) return { error: error.message };
+      return { collections: data };
+    }
+    case "update_collection": {
+      const update = pick(args, ["active", "sort_order", "name"]);
+      if (!Object.keys(update).length) return { error: "No fields to update" };
+      let id = args.id;
+      if (!id && args.name_or_slug) {
+        const m = args.name_or_slug.trim();
+        const { data } = await db.from("collections").select("id").or(`name.ilike.%${m}%,slug.ilike.%${m}%`).limit(1);
+        id = data?.[0]?.id;
+      }
+      if (!id) return { error: "Collection not found" };
+      const { data, error } = await db.from("collections").update(update).eq("id", id).select();
+      if (error) return { error: error.message };
+      return { updated: data };
+    }
+    case "list_banners": {
+      const { data, error } = await db.from("banners").select("id,title,subtitle,eyebrow,image,cta_label,cta_link,active,sort_order").order("sort_order");
+      if (error) return { error: error.message };
+      return { banners: data };
+    }
+    case "update_banner": {
+      const update = pick(args, ["active", "sort_order", "title", "subtitle", "cta_label", "cta_link"]);
+      if (!Object.keys(update).length) return { error: "No fields to update" };
+      let id = args.id;
+      if (!id && args.title_match) {
+        const { data } = await db.from("banners").select("id").ilike("title", `%${args.title_match}%`).limit(1);
+        id = data?.[0]?.id;
+      }
+      if (!id) return { error: "Banner not found" };
+      const { data, error } = await db.from("banners").update(update).eq("id", id).select();
+      if (error) return { error: error.message };
+      return { updated: data };
+    }
+    case "create_banner": {
+      if (!args.image || typeof args.image !== "string") return { error: "An image URL is required to create a banner. Please provide one." };
+      const { data, error } = await db.from("banners").insert({
+        title: args.title, image: args.image, subtitle: args.subtitle ?? null,
+        cta_label: args.cta_label ?? null, cta_link: args.cta_link ?? null,
+        active: args.active ?? true, sort_order: args.sort_order ?? 0,
+      }).select().single();
+      if (error) return { error: error.message };
+      return { created: data };
+    }
+    case "list_reviews": {
+      let q = db.from("reviews").select("id,product_id,rating,title,body,enabled,created_at");
+      if (args.enabled !== undefined) q = q.eq("enabled", args.enabled);
+      if (args.product_name_contains) {
+        const { data: prods } = await db.from("products").select("id,name").ilike("name", `%${args.product_name_contains}%`);
+        const ids = (prods ?? []).map((p: any) => p.id);
+        if (!ids.length) return { reviews: [] };
+        q = q.in("product_id", ids);
+      }
+      const { data, error } = await q.order("created_at", { ascending: false }).limit(Math.min(args.limit ?? 20, 100));
+      if (error) return { error: error.message };
+      const pids = [...new Set((data ?? []).map((r: any) => r.product_id))];
+      const names = new Map<string, string>();
+      if (pids.length) {
+        const { data: prods } = await db.from("products").select("id,name").in("id", pids);
+        for (const p of prods ?? []) names.set(p.id, p.name);
+      }
+      return { reviews: (data ?? []).map((r: any) => ({ ...r, product_name: names.get(r.product_id) ?? null })) };
+    }
+    case "update_review": {
+      if (args.enabled === undefined) return { error: "No fields to update" };
+      const { data, error } = await db.from("reviews").update({ enabled: args.enabled }).eq("id", args.id).select("id,enabled");
+      if (error) return { error: error.message };
+      return { updated: data };
+    }
+    case "delete_review": {
+      const { error } = await db.from("reviews").delete().eq("id", args.id);
+      if (error) return { error: error.message };
+      return { deleted: args.id };
+    }
+    case "get_settings": {
+      const { data, error } = await db.from("site_settings").select("*").order("created_at", { ascending: true }).limit(1).maybeSingle();
+      if (error) return { error: error.message };
+      if (!data) return { settings: null };
+      const { postex_api_key: _redacted, ...safe } = data;
+      return { settings: safe };
+    }
+    case "update_settings": {
+      const fields = args.fields ?? {};
+      const update = pick(fields, SETTINGS_ALLOWED);
+      const rejected = Object.keys(fields).filter((k) => !SETTINGS_ALLOWED.includes(k));
+      if (!Object.keys(update).length) return { error: "No allowed fields to update", rejected };
+      const { data: row } = await db.from("site_settings").select("id").order("created_at", { ascending: true }).limit(1).maybeSingle();
+      if (!row) return { error: "Settings row not found" };
+      const { error } = await db.from("site_settings").update(update).eq("id", row.id);
+      if (error) return { error: error.message };
+      return { updated_fields: Object.keys(update), rejected: rejected.length ? rejected : undefined };
+    }
+    case "list_customers": {
+      let q = db.from("profiles").select("id,display_name,email,phone,city,created_at");
+      if (args.email_contains) q = q.ilike("email", `%${args.email_contains}%`);
+      const { data, error } = await q.order("created_at", { ascending: false }).limit(Math.min(args.limit ?? 20, 100));
+      if (error) return { error: error.message };
+      return { customers: data };
+    }
+    case "list_promo_messages": {
+      const { data, error } = await db.from("promo_messages").select("id,message,active,sort_order").order("sort_order");
+      if (error) return { error: error.message };
+      return { promo_messages: data };
+    }
+    case "update_promo_message": {
+      const update = pick(args, ["active", "message", "sort_order"]);
+      if (!Object.keys(update).length) return { error: "No fields to update" };
+      const { data, error } = await db.from("promo_messages").update(update).eq("id", args.id).select();
+      if (error) return { error: error.message };
+      return { updated: data };
+    }
     default:
       return { error: `Unknown tool ${name}` };
   }
@@ -352,7 +532,7 @@ serve(async (req) => {
 
     const { messages } = await req.json();
 
-    const systemPrompt = `You are an admin assistant for the Time & Trend e-commerce store. You can perform DB operations via tools. Be concise. After each operation, summarize what was done in 1-2 sentences. If the user's intent is unclear or destructive (delete, bulk update many records), confirm before acting. Order references like 'TT-1001', '#TT-1001' or '1001' are ORDER NUMBERS — pass them to update_orders_status via order_numbers (ranges like '1001 to 1009' via number_range_from/number_range_to). 8-character hex like 'B034E685' is a SHORT id — use id_short_prefixes. NEVER put order numbers or short ids into order_ids; that array is for full UUIDs only. When the user says 'Delivered and Paid', set status='delivered', fulfillment_status='delivered', payment_status='paid'. If a tool result includes not_found, mention those references in your reply. Today is ${new Date().toISOString().slice(0, 10)}.`;
+    const systemPrompt = `You are an admin assistant for the Time & Trend e-commerce store. You can perform DB operations via tools across the whole admin panel: orders, discounts, products, sales, customer queries (list, reply, mark read), collections, banners (list, create, update), reviews (list, enable/disable, delete), store settings (view/update; PostEx credentials are never exposed or editable here), customers, and promo bar messages. Be concise. After each operation, summarize what was done in 1-2 sentences. If the user's intent is unclear or destructive (delete_review, delete_discount, anything deleting data, or bulk updates affecting many records), confirm before acting. Customer-query replies are read directly by the customer — write them professionally, warmly and on-brand for Time & Trend. Order references like 'TT-1001', '#TT-1001' or '1001' are ORDER NUMBERS — pass them to update_orders_status via order_numbers (ranges like '1001 to 1009' via number_range_from/number_range_to). 8-character hex like 'B034E685' is a SHORT id — use id_short_prefixes. NEVER put order numbers or short ids into order_ids; that array is for full UUIDs only. When the user says 'Delivered and Paid', set status='delivered', fulfillment_status='delivered', payment_status='paid'. If a tool result includes not_found, mention those references in your reply. Today is ${new Date().toISOString().slice(0, 10)}.`;
 
     const conversation: any[] = [
       { role: "system", content: systemPrompt },

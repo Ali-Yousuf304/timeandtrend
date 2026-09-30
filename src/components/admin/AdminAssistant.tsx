@@ -24,7 +24,7 @@ export function AdminAssistant() {
     {
       role: "assistant",
       content:
-        "Hi! I'm your admin assistant. Try things like:\n• Mark orders 1001 to 1009 as shipped\n• Create 10% discount with code SAVE10\n• Show today's total revenue\n• Set all formal products as bestseller",
+        "Hi! I'm your admin assistant. Try things like:\n• Mark orders 1001 to 1009 as shipped\n• Create 10% discount with code SAVE10\n• Show today's total revenue\n• Set all formal products as bestseller\n• Reply to the latest query from ali@example.com saying their order ships tomorrow\n• Set free shipping threshold to 5000 and flat rate to 250",
     },
   ]);
   const scrollRef = React.useRef<HTMLDivElement>(null);
