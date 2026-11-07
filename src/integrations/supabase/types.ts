@@ -56,6 +56,7 @@ export type Database = {
           eyebrow: string | null
           id: string
           image: string
+          placement: string
           sort_order: number
           subtitle: string | null
           title: string
@@ -69,6 +70,7 @@ export type Database = {
           eyebrow?: string | null
           id?: string
           image: string
+          placement?: string
           sort_order?: number
           subtitle?: string | null
           title: string
@@ -82,6 +84,7 @@ export type Database = {
           eyebrow?: string | null
           id?: string
           image?: string
+          placement?: string
           sort_order?: number
           subtitle?: string | null
           title?: string
@@ -362,55 +365,70 @@ export type Database = {
       }
       products: {
         Row: {
+          availability: string
           badges: string[] | null
+          care: string | null
           category: string
           created_at: string
           description: string
           id: string
           image: string
           images: string[]
+          material: string | null
           name: string
           old_price: number | null
           price: number
           rating: number
           specs: Json
+          stock: number
           style: string
           tagline: string
           updated_at: string
+          variants: Json
         }
         Insert: {
+          availability?: string
           badges?: string[] | null
+          care?: string | null
           category: string
           created_at?: string
           description?: string
           id?: string
           image: string
           images?: string[]
+          material?: string | null
           name: string
           old_price?: number | null
           price: number
           rating?: number
           specs?: Json
+          stock?: number
           style: string
           tagline: string
           updated_at?: string
+          variants?: Json
         }
         Update: {
+          availability?: string
           badges?: string[] | null
+          care?: string | null
           category?: string
           created_at?: string
           description?: string
           id?: string
           image?: string
           images?: string[]
+          material?: string | null
           name?: string
           old_price?: number | null
           price?: number
           rating?: number
           specs?: Json
+          stock?: number
           style?: string
           tagline?: string
           updated_at?: string
+          variants?: Json
         }
         Relationships: []
       }
