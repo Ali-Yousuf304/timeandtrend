@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WishlistRouteImport } from './routes/wishlist'
+import { Route as ShopRouteImport } from './routes/shop'
 import { Route as ReviewsRouteImport } from './routes/reviews'
+import { Route as GiftBoxesRouteImport } from './routes/gift-boxes'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as CheckoutRouteImport } from './routes/checkout'
@@ -37,9 +39,19 @@ const WishlistRoute = WishlistRouteImport.update({
   path: '/wishlist',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReviewsRoute = ReviewsRouteImport.update({
   id: '/reviews',
   path: '/reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GiftBoxesRoute = GiftBoxesRouteImport.update({
+  id: '/gift-boxes',
+  path: '/gift-boxes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -153,7 +165,9 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/collections': typeof CollectionsRoute
   '/contact': typeof ContactRoute
+  '/gift-boxes': typeof GiftBoxesRoute
   '/reviews': typeof ReviewsRoute
+  '/shop': typeof ShopRoute
   '/wishlist': typeof WishlistRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/collections': typeof AdminCollectionsRoute
@@ -176,7 +190,9 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/collections': typeof CollectionsRoute
   '/contact': typeof ContactRoute
+  '/gift-boxes': typeof GiftBoxesRoute
   '/reviews': typeof ReviewsRoute
+  '/shop': typeof ShopRoute
   '/wishlist': typeof WishlistRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/collections': typeof AdminCollectionsRoute
@@ -201,7 +217,9 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/collections': typeof CollectionsRoute
   '/contact': typeof ContactRoute
+  '/gift-boxes': typeof GiftBoxesRoute
   '/reviews': typeof ReviewsRoute
+  '/shop': typeof ShopRoute
   '/wishlist': typeof WishlistRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/collections': typeof AdminCollectionsRoute
@@ -227,7 +245,9 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/collections'
     | '/contact'
+    | '/gift-boxes'
     | '/reviews'
+    | '/shop'
     | '/wishlist'
     | '/admin/banners'
     | '/admin/collections'
@@ -250,7 +270,9 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/collections'
     | '/contact'
+    | '/gift-boxes'
     | '/reviews'
+    | '/shop'
     | '/wishlist'
     | '/admin/banners'
     | '/admin/collections'
@@ -274,7 +296,9 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/collections'
     | '/contact'
+    | '/gift-boxes'
     | '/reviews'
+    | '/shop'
     | '/wishlist'
     | '/admin/banners'
     | '/admin/collections'
@@ -299,7 +323,9 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   CollectionsRoute: typeof CollectionsRoute
   ContactRoute: typeof ContactRoute
+  GiftBoxesRoute: typeof GiftBoxesRoute
   ReviewsRoute: typeof ReviewsRoute
+  ShopRoute: typeof ShopRoute
   WishlistRoute: typeof WishlistRoute
   ProductIdRoute: typeof ProductIdRoute
 }
@@ -313,11 +339,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WishlistRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reviews': {
       id: '/reviews'
       path: '/reviews'
       fullPath: '/reviews'
       preLoaderRoute: typeof ReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gift-boxes': {
+      id: '/gift-boxes'
+      path: '/gift-boxes'
+      fullPath: '/gift-boxes'
+      preLoaderRoute: typeof GiftBoxesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -501,7 +541,9 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   CollectionsRoute: CollectionsRoute,
   ContactRoute: ContactRoute,
+  GiftBoxesRoute: GiftBoxesRoute,
   ReviewsRoute: ReviewsRoute,
+  ShopRoute: ShopRoute,
   WishlistRoute: WishlistRoute,
   ProductIdRoute: ProductIdRoute,
 }
