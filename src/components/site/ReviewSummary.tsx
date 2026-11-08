@@ -1,3 +1,4 @@
+import { approvedReviewStats } from "@/lib/review-stats";
 import * as React from "react";
 import { Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,14 +31,14 @@ export function ReviewSummary({ productId, reviews, onReviewSubmitted }: Props) 
   const stats = React.useMemo(() => {
     const buckets = [0, 0, 0, 0, 0]; // index 0 = 1★
     let sum = 0;
-    reviews.forEach((r) => {
+    reviews.filter((r) => r.enabled).forEach((r) => {
       const idx = Math.max(0, Math.min(4, r.rating - 1));
       buckets[idx]++;
       sum += r.rating;
     });
     return {
-      total: reviews.length,
-      average: reviews.length ? sum / reviews.length : 0,
+      total: approvedReviewStats(reviews).count,
+      average: approvedReviewStats(reviews).average,
       buckets,
     };
   }, [reviews]);
@@ -47,6 +48,7 @@ export function ReviewSummary({ productId, reviews, onReviewSubmitted }: Props) 
   return (
     <>
       <div className="grid gap-6 rounded-xl border border-border bg-card p-6 md:grid-cols-[180px_1fr_auto] md:items-center">
+        {stats.total > 0 ? <>
         {/* Left — Average */}
         <div className="text-center md:border-r md:border-border md:pr-6">
           <p className="font-display text-5xl font-bold">
@@ -92,6 +94,7 @@ export function ReviewSummary({ productId, reviews, onReviewSubmitted }: Props) 
           })}
         </div>
 
+        </> : <p className="text-muted-foreground md:col-span-2">Be the first to review</p>}
         {/* Right — CTA */}
         <Button
           onClick={() => setOpen(true)}
