@@ -1,144 +1,39 @@
-import { motion } from "framer-motion";
-import { Heart, Eye, Star } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
-import type { Product } from "@/data/products";
-import { useCart } from "@/context/CartContext";
-import { useWishlist } from "@/context/WishlistContext";
-import { Button } from "@/components/ui/button";
-import { useProductRating } from "@/hooks/use-product-ratings";
-import { cn } from "@/lib/utils";
+import { useState } from 'react';
+import { Heart, Eye, Plus } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+import type { Product } from '@/data/products';
+import { useCart } from '@/context/CartContext';
+import { useWishlist } from '@/context/WishlistContext';
+import { Button } from '@/components/ui/button';
+import { useProductRating } from '@/hooks/use-product-ratings';
+import { ProductModal } from './ProductModal';
+import { Rating } from './Rating';
+import { cn } from '@/lib/utils';
 
-interface Props {
-  product: Product;
-  onQuickView?: (p: Product) => void;
-}
-
-export function ProductCard({ product, onQuickView }: Props) {
-  const { add } = useCart();
-  const { has, toggle } = useWishlist();
-  const navigate = useNavigate();
-  const wished = has(product.id);
-  const rating = useProductRating(product.id);
-
-  const goToProduct = () => {
-    navigate({ to: "/product/$id", params: { id: product.id } });
-  };
-
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 10 }}
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.3 }}
-      className="group flex cursor-pointer flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-shadow hover:shadow-xl"
-      onClick={goToProduct}
-    >
-      <div className="relative aspect-square overflow-hidden bg-muted">
-        {product.badges && (
-          <div className="absolute left-3 top-3 z-10 flex gap-2">
-            {product.badges.map((b) => (
-              <span
-                key={b}
-                className={
-                  b === "new"
-                    ? "rounded bg-[var(--gold)] px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-[var(--gold-foreground)]"
-                    : "rounded bg-[var(--ink)] px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-[var(--ink-foreground)]"
-                }
-              >
-                {b}
-              </span>
-            ))}
-          </div>
-        )}
-        <div className="absolute right-3 top-3 z-10 flex flex-col gap-2">
-          <button
-            type="button"
-            aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-            onClick={(e) => {
-              e.stopPropagation();
-              toggle(product.id);
-            }}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-background/90 shadow-sm backdrop-blur transition-colors hover:bg-background"
-          >
-            <Heart
-              className={cn(
-                "h-4 w-4 transition-colors",
-                wished ? "fill-[var(--gold)] text-[var(--gold)]" : "text-foreground/70",
-              )}
-            />
-          </button>
-          <button
-            type="button"
-            aria-label="Quick view"
-            onClick={(e) => {
-              e.stopPropagation();
-              onQuickView?.(product);
-            }}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-background/90 shadow-sm backdrop-blur transition-colors hover:bg-background"
-          >
-            <Eye className="h-4 w-4 text-foreground/70" />
-          </button>
-        </div>
-        <img
-          src={product.image}
-          alt={product.name}
-          loading="lazy"
-          className={cn(
-            "h-full w-full object-contain p-6 transition-all duration-500 group-hover:scale-110",
-            product.images && product.images.length > 0 && "group-hover:opacity-0",
-          )}
-        />
-        {product.images && product.images.length > 0 && (
-          <img
-            src={product.images[0]}
-            alt={`${product.name} alternate view`}
-            loading="lazy"
-            aria-hidden="true"
-            className="absolute inset-0 h-full w-full object-contain p-6 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-          />
-        )}
+export function ProductCard({ product, onQuickView }: { product: Product; onQuickView?: (p: Product) => void }) {
+  const { add } = useCart(); const { has, toggle } = useWishlist();
+  const rating = useProductRating(product.id); const [quick, setQuick] = useState(false);
+  const soldOut = product.availability === 'sold_out' || (product.stock === 0 && product.availability !== 'pre_order');
+  return <article className="group min-w-0">
+    <div className="relative aspect-square overflow-hidden rounded-md bg-muted">
+      <Link to="/product/$id" params={{ id: product.id }} aria-label={product.name}>
+        <img src={product.image} alt={product.name} loading="lazy" width={768} height={768} className={cn('h-full w-full object-cover transition duration-500 group-hover:scale-105', product.images?.length && 'group-hover:opacity-0')} />
+        {product.images?.[0] && <img src={product.images[0]} alt={`${product.name} alternate view`} loading="lazy" className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity group-hover:opacity-100" />}
+      </Link>
+      <div className="absolute left-3 top-3 flex flex-wrap gap-1">
+        {soldOut ? <span className="rounded bg-foreground px-2 py-1 text-[10px] text-background">Sold out</span> : product.availability === 'pre_order' ? <span className="rounded bg-secondary px-2 py-1 text-[10px]">Pre-order</span> : product.badges?.slice(0,1).map((b) => <span key={b} className="rounded bg-background px-2 py-1 text-[10px] font-medium text-primary">{b === 'bestseller' ? 'Bestseller' : 'New arrival'}</span>)}
       </div>
-      <div className="flex flex-1 flex-col p-4 text-center">
-        <h3 className="font-display text-lg font-semibold">{product.name}</h3>
-        <p className="mt-1 flex-1 text-sm text-muted-foreground">{product.tagline}</p>
-
-        <div className="mt-2 flex items-center justify-center gap-1">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Star
-              key={i}
-              className={cn(
-                "h-3.5 w-3.5",
-                i < Math.round(rating.average)
-                  ? "fill-[var(--gold)] text-[var(--gold)]"
-                  : "text-muted-foreground/40",
-              )}
-            />
-          ))}
-          <span className="ml-1 text-xs text-muted-foreground">
-            {rating.count > 0 ? `(${rating.count})` : "(0)"}
-          </span>
-        </div>
-
-        <p className="mt-3 text-lg font-bold text-[var(--gold)]">
-          Rs. {product.price.toLocaleString()}
-          {product.oldPrice && (
-            <span className="ml-2 text-sm font-normal text-muted-foreground line-through">
-              Rs. {product.oldPrice.toLocaleString()}
-            </span>
-          )}
-        </p>
-        <Button
-          className="mt-4 w-full bg-[var(--ink)] text-[var(--ink-foreground)] hover:bg-[var(--gold)] hover:text-[var(--gold-foreground)]"
-          onClick={(e) => {
-            e.stopPropagation();
-            add(product);
-          }}
-        >
-          Add to Cart
-        </Button>
+      <div className="absolute right-2 top-2 flex flex-col gap-1">
+        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-background/90" title="Wishlist" aria-label={has(product.id) ? 'Remove from wishlist' : 'Add to wishlist'} onClick={() => toggle(product.id)}><Heart className={cn('h-4 w-4', has(product.id) && 'fill-gold text-gold')} /></Button>
+        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-background/90" title="Quick view" aria-label="Quick view" onClick={() => onQuickView ? onQuickView(product) : setQuick(true)}><Eye className="h-4 w-4" /></Button>
       </div>
-    </motion.div>
-  );
+    </div>
+    <div className="pt-4">
+      <p className="text-[10px] uppercase text-muted-foreground">{product.category.replaceAll('-', ' ')}</p>
+      <Link to="/product/$id" params={{ id: product.id }}><h3 className="mt-1 min-h-12 font-display text-lg leading-snug">{product.name}</h3></Link>
+      <Rating {...rating} />
+      <div className="mt-3 flex items-center justify-between gap-2"><p className="text-sm font-semibold">Rs. {product.price.toLocaleString()}{product.oldPrice && <span className="ml-2 text-xs font-normal text-muted-foreground line-through">Rs. {product.oldPrice.toLocaleString()}</span>}</p><Button variant="outline" size="icon" title="Add to cart" aria-label={`Add ${product.name} to cart`} disabled={soldOut} onClick={() => add(product)}><Plus className="h-4 w-4" /></Button></div>
+    </div>
+    <ProductModal product={quick ? product : null} onClose={() => setQuick(false)} />
+  </article>;
 }

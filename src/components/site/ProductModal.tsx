@@ -1,3 +1,4 @@
+import { Rating } from "./Rating";
 import * as React from "react";
 import { Heart, ShoppingCart, ArrowRight, Star } from "lucide-react";
 import { Link } from "@tanstack/react-router";
@@ -53,22 +54,7 @@ export function ProductModal({ product, onClose }: Props) {
               <p className="mt-3 text-sm text-muted-foreground">
                 {product.tagline}
               </p>
-              <div className="mt-3 flex items-center gap-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={cn(
-                      "h-3.5 w-3.5",
-                      i < Math.round(rating.average)
-                        ? "fill-[var(--gold)] text-[var(--gold)]"
-                        : "text-muted-foreground/40",
-                    )}
-                  />
-                ))}
-                <span className="ml-1 text-xs text-muted-foreground">
-                  ({rating.count})
-                </span>
-              </div>
+              <div className="mt-3"><Rating {...rating} /></div>
               <p className="mt-5 font-display text-3xl font-bold text-[var(--gold)]">
                 Rs. {product.price.toLocaleString()}
                 {product.oldPrice && (
@@ -82,6 +68,7 @@ export function ProductModal({ product, onClose }: Props) {
                   <Button
                     className="flex-1 bg-[var(--gold)] text-[var(--gold-foreground)] hover:bg-[var(--gold)]/90"
                     size="lg"
+                    disabled={product.stock <= 0 && product.availability !== "pre_order"}
                     onClick={() => {
                       add(product);
                       onClose();

@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Time & Trend luxury design system.
+ * Subhani Studio worship design system.
  * Palette: deep ink background, warm gold accent, off-white surfaces.
  */
 
@@ -40,12 +40,12 @@
   --color-ink: var(--ink);
   --color-ink-foreground: var(--ink-foreground);
   --font-display: "Playfair Display", "Cormorant Garamond", serif;
-  --font-sans: "Montserrat", system-ui, sans-serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
 }
 
 :root {
   --radius: 0.5rem;
-  --background: oklch(0.99 0.003 90);
+  --background: oklch(0.985 0.006 90);
   --foreground: oklch(0.18 0.01 80);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.18 0.01 80);
@@ -53,8 +53,8 @@
   --popover-foreground: oklch(0.18 0.01 80);
 
   /* Primary = gold */
-  --primary: oklch(0.78 0.12 85);
-  --primary-foreground: oklch(0.18 0.01 80);
+  --primary: oklch(0.32 0.055 163);
+  --primary-foreground: oklch(0.98 0.008 90);
 
   --secondary: oklch(0.96 0.005 90);
   --secondary-foreground: oklch(0.18 0.01 80);
@@ -71,7 +71,7 @@
   /* Brand tokens */
   --gold: oklch(0.78 0.12 85);
   --gold-foreground: oklch(0.18 0.01 80);
-  --ink: oklch(0.16 0.01 270);
+  --ink: oklch(0.25 0.045 163);
   --ink-foreground: oklch(0.98 0.003 90);
 }
 
@@ -116,7 +116,7 @@
     font-family: var(--font-display);
     font-weight: 600;
     line-height: 1.15;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
   }
 }
 
@@ -148,3 +148,5 @@
     to   { transform: translateX(-50%); }
   }
 }
+
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }

@@ -1,3 +1,4 @@
+import { catalogImage } from "@/lib/catalog-images";
 import * as React from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Badge, Category, Product, ProductSpec, Style } from "@/data/products";
@@ -16,6 +17,11 @@ interface DbProductRow {
   rating: number;
   description: string;
   specs: unknown;
+  variants?: unknown;
+  stock?: number;
+  availability?: string;
+  material?: string | null;
+  care?: string | null;
 }
 
 function mapProduct(row: DbProductRow): Product {
@@ -32,20 +38,21 @@ function mapProduct(row: DbProductRow): Product {
     tagline: row.tagline,
     price: Number(row.price),
     oldPrice: row.old_price != null ? Number(row.old_price) : undefined,
-    image: row.image,
-    images: Array.isArray(row.images) ? row.images.filter(Boolean) : [],
-    category: (["men", "women", "unisex"].includes(row.category)
-      ? row.category
-      : "unisex") as Category,
-    style: (["casual", "formal", "sports"].includes(row.style)
-      ? row.style
-      : "casual") as Style,
+    image: catalogImage(row.image),
+    images: Array.isArray(row.images) ? row.images.filter(Boolean).map(catalogImage) : [],
+    category: row.category as Category,
+    style: row.style as Style,
     badges: (row.badges ?? []).filter(
       (b): b is Badge => b === "new" || b === "bestseller",
     ),
     rating: row.rating,
     description: row.description,
     specs,
+    variants: Array.isArray(row.variants) ? row.variants : [],
+    stock: row.stock ?? 0,
+    availability: row.availability ?? "in_stock",
+    material: row.material ?? undefined,
+    care: row.care ?? undefined,
   };
 }
 
@@ -59,8 +66,9 @@ export function useProducts() {
       const { data } = await supabase
         .from("products")
         .select(
-          "id,name,tagline,price,old_price,image,images,category,style,badges,rating,description,specs",
+          "id,name,tagline,price,old_price,image,images,category,style,badges,rating,description,specs,variants,stock,availability,material,care",
         )
+        .neq("availability", "archived")
         .order("created_at", { ascending: false });
       if (cancelled) return;
       setProducts((data ?? []).map((r) => mapProduct(r as DbProductRow)));

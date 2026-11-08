@@ -1,29 +1,18 @@
-// Shared product types used across the storefront.
-// Products themselves are loaded dynamically from the database
-// via the `useProducts` hook in src/hooks/use-products.ts.
-
-export type Category = "men" | "women" | "unisex";
-export type Style = "casual" | "formal" | "sports";
-export type Badge = "new" | "bestseller";
-
-export interface ProductSpec {
-  label: string;
-  value: string;
-}
-
+export const categories = [
+  { slug: 'prayer-mats', name: 'Prayer Mats' }, { slug: 'tasbeeh', name: 'Tasbeeh' },
+  { slug: 'attar', name: 'Attar' }, { slug: 'prayer-wear', name: 'Prayer Wear' },
+  { slug: 'ihram', name: 'Ihram' }, { slug: 'quran', name: 'Quran & Accessories' },
+  { slug: 'gift-boxes', name: 'Hadiya Gift Boxes' },
+] as const;
+export type Category = string;
+export type Style = string;
+export type Badge = 'new' | 'bestseller';
+export interface ProductSpec { label: string; value: string }
+export interface ProductVariant { name: string; color?: string; size?: string; stock: number; price?: number }
 export interface Product {
-  id: string;
-  name: string;
-  tagline: string;
-  price: number;
-  oldPrice?: number;
-  image: string;
-  /** Additional images beyond the main `image`. Combined gallery = [image, ...images]. */
-  images?: string[];
-  category: Category;
-  style: Style;
-  badges?: Badge[];
-  rating: number;
-  description: string;
-  specs: ProductSpec[];
+  id: string; name: string; tagline: string; price: number; oldPrice?: number;
+  image: string; images?: string[]; category: Category; style: Style;
+  badges?: Badge[]; rating: number; description: string; specs: ProductSpec[];
+  stock: number; availability: string; material?: string; care?: string;
+  variants: ProductVariant[]; selectedVariant?: string;
 }
