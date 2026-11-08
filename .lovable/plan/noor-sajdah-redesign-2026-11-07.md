@@ -1,10 +1,10 @@
-# Noor Sajdah redesign
+# Subhani Studio redesign
 
 ## Result
 Transform the existing store into a calm, premium Islamic lifestyle shop for Pakistan, while keeping its commerce, admin dashboard, AI assistant, shipping and order-numbering features.
 
 ## Branding and design
-- Make `site_settings.store_name` the editable brand source, with one shared Noor Sajdah fallback; apply it across the storefront, admin, emails and page titles.
+- Make `site_settings.store_name` the editable brand source, with one shared Subhani Studio fallback; apply it across the storefront, admin, emails and page titles. Use SS for new order numbers; preserve existing numbers.
 - Use deep emerald, ivory, soft gold and charcoal, serif headings and clean body typography. Add original product imagery, subtle geometric dividers and tasteful Arabic calligraphy.
 - Replace watch content and assets throughout active pages, forms, metadata, email templates and assistant prompts. Change the prefix for newly generated orders; preserve historical order numbers.
 
@@ -26,7 +26,7 @@ Transform the existing store into a calm, premium Islamic lifestyle shop for Pak
 - Set configurable delivery to Rs. 250 and free above Rs. 1,999.
 - Add editable announcement content to the existing banners administration and retain existing promotions controls.
 - Keep Karachi contact details visibly identified as placeholders. Do not invent bank accounts, support numbers or social accounts; leave those configurable until supplied.
-- Treat the requested 4.8/5 and 10,000+ figures as demonstration copy, not verified business statistics.
+- Compute average ratings and total review counts only from real approved database reviews on cards, product pages and the home trust strip. Hide the stats strip when there are none and show "Be the first to review" for empty reviews. Never seed invented testimonials or customer claims; customer counts must use real order data or be removed.
 
 ## Technical details
 - Extend existing product data with generic attributes, variants and availability; retain historical order items and customer data when replacing sample products.
