@@ -1,3 +1,4 @@
+import { pageHead, storeName } from "@/lib/brand";
 import * as React from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Heart, Trash2 } from "lucide-react";
@@ -8,12 +9,7 @@ import { useProducts } from "@/hooks/use-products";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/wishlist")({
-  head: () => ({
-    meta: [
-      { title: "My Wishlist — Time & Trend" },
-      { name: "description", content: "Your saved luxury timepieces." },
-    ],
-  }),
+  head: () => pageHead("My Wishlist", "Your saved prayer essentials and meaningful gifts."),
   component: WishlistPage,
 });
 

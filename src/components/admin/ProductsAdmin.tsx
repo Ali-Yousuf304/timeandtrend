@@ -1,3 +1,5 @@
+import { categories, type ProductVariant, type ProductSpec } from "@/data/products";
+import { catalogImage } from "@/lib/catalog-images";
 import * as React from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -22,8 +24,14 @@ interface DbProduct {
   old_price: number | null;
   image: string;
   images: string[];
-  category: "men" | "women" | "unisex";
-  style: "casual" | "formal" | "sports";
+  category: string;
+  style: string;
+  stock: number;
+  availability: string;
+  material: string | null;
+  care: string | null;
+  variants: ProductVariant[];
+  specs: ProductSpec[];
   badges: string[] | null;
   rating: number;
   description: string;
@@ -133,10 +141,16 @@ export function ProductsAdmin() {
       old_price: editing.old_price ? Number(editing.old_price) : null,
       image: editing.image ?? "",
       images: editing.images ?? [],
-      category: (editing.category ?? "men") as DbProduct["category"],
-      style: (editing.style ?? "casual") as DbProduct["style"],
+      category: (editing.category ?? "prayer-mats") as DbProduct["category"],
+      style: (editing.style ?? "everyday") as DbProduct["style"],
       badges: editing.badges ?? [],
-      rating: Number(editing.rating ?? 5),
+      rating: 0,
+      stock: Number(editing.stock ?? 0),
+      availability: editing.availability ?? "in_stock",
+      material: editing.material ?? null,
+      care: editing.care ?? null,
+      variants: editing.variants ?? [],
+      specs: editing.specs ?? [],
       description: editing.description ?? "",
     };
     const { error } = editing.id
@@ -236,7 +250,7 @@ export function ProductsAdmin() {
                       (i === 0 ? "border-[var(--gold)]" : "border-border")
                     }
                   >
-                    <img src={url} alt="" className="h-full w-full bg-card object-contain p-1" />
+                    <img src={catalogImage(url)} alt="" className="h-full w-full bg-card object-contain p-1" />
                     {i === 0 && (
                       <span className="absolute bottom-0 left-0 right-0 bg-[var(--gold)] px-1 text-center text-[9px] font-bold uppercase text-[var(--gold-foreground)]">
                         Main
@@ -290,7 +304,7 @@ export function ProductsAdmin() {
             <div>
               <Label>Category</Label>
               <Select
-                value={editing.category ?? "men"}
+                value={editing.category ?? "prayer-mats"}
                 onValueChange={(v) =>
                   setEditing({ ...editing, category: v as DbProduct["category"] })
                 }
@@ -299,16 +313,14 @@ export function ProductsAdmin() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="men">Men</SelectItem>
-                  <SelectItem value="women">Women</SelectItem>
-                  <SelectItem value="unisex">Unisex</SelectItem>
+                  {categories.map((c) => <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Style</Label>
+              <Label>Product series</Label>
               <Select
-                value={editing.style ?? "casual"}
+                value={editing.style ?? "everyday"}
                 onValueChange={(v) =>
                   setEditing({ ...editing, style: v as DbProduct["style"] })
                 }
@@ -317,12 +329,20 @@ export function ProductsAdmin() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="casual">Casual</SelectItem>
-                  <SelectItem value="formal">Formal</SelectItem>
-                  <SelectItem value="sports">Sports</SelectItem>
+                  <SelectItem value="everyday">Everyday essentials</SelectItem>
+                  <SelectItem value="kids-series">Kids Series</SelectItem>
+                  <SelectItem value="velvet-padded">Velvet & Padded</SelectItem>
+                  <SelectItem value="premium">Premium</SelectItem>
+                  <SelectItem value="travel">Travel</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+            <div><Label>Stock</Label><Input type="number" min="0" value={editing.stock ?? 0} onChange={(e) => setEditing({...editing, stock: Number(e.target.value)})} /></div>
+            <div><Label>Availability</Label><Select value={editing.availability ?? "in_stock"} onValueChange={(v) => setEditing({...editing, availability: v})}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="in_stock">In stock</SelectItem><SelectItem value="sold_out">Sold out</SelectItem><SelectItem value="pre_order">Pre-order</SelectItem></SelectContent></Select></div>
+            <div><Label>Material</Label><Input value={editing.material ?? ""} onChange={(e) => setEditing({...editing, material:e.target.value})} /></div>
+            <div><Label>Care</Label><Input value={editing.care ?? ""} onChange={(e) => setEditing({...editing, care:e.target.value})} /></div>
+            <div className="md:col-span-2"><Label>Specifications</Label>{(editing.specs ?? []).map((spec,i) => <div key={i} className="mt-2 flex gap-2"><Input aria-label="Specification name" placeholder="Size, color, fragrance notes or weight" value={spec.label} onChange={(e) => setEditing({...editing,specs:editing.specs?.map((v,j) => j===i?{...v,label:e.target.value}:v)})}/><Input aria-label="Specification value" value={spec.value} onChange={(e) => setEditing({...editing,specs:editing.specs?.map((v,j) => j===i?{...v,value:e.target.value}:v)})}/><Button variant="ghost" size="icon" aria-label="Remove specification" onClick={() => setEditing({...editing,specs:editing.specs?.filter((_,j)=>j!==i)})}><XIcon /></Button></div>)}<Button variant="outline" className="mt-2" onClick={()=>setEditing({...editing,specs:[...(editing.specs??[]),{label:"",value:""}]})}><Plus/> Add specification</Button></div>
+            <div className="md:col-span-2"><Label>Variants</Label>{(editing.variants ?? []).map((v,i) => <div key={i} className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-6"><Input aria-label="Variant name" placeholder="Name" value={v.name} onChange={e=>setEditing({...editing,variants:editing.variants?.map((a,j)=>j===i?{...a,name:e.target.value}:a)})}/>{(["color","size","stock","price"] as const).map(k=><Input key={k} aria-label={`Variant ${k}`} placeholder={k} type={k==="stock"||k==="price"?"number":"text"} value={v[k]??""} onChange={e=>setEditing({...editing,variants:editing.variants?.map((a,j)=>j===i?{...a,[k]:k==="stock"||k==="price"?Number(e.target.value):e.target.value}:a)})}/>)}<Button variant="ghost" size="icon" aria-label="Remove variant" onClick={()=>setEditing({...editing,variants:editing.variants?.filter((_,j)=>j!==i)})}><XIcon/></Button></div>)}<Button variant="outline" className="mt-2" onClick={()=>setEditing({...editing,variants:[...(editing.variants??[]),{name:"",stock:0}]})}><Plus/> Add variant</Button></div>
             <div className="md:col-span-2">
               <Label>Badges</Label>
               <div className="mt-2 flex gap-2">
@@ -380,7 +400,7 @@ export function ProductsAdmin() {
           >
             {p.image && (
               <img
-                src={p.image}
+                src={catalogImage(p.image)}
                 alt=""
                 className="h-14 w-14 rounded bg-muted object-contain p-1"
               />

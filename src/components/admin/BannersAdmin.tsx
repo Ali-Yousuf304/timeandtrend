@@ -1,3 +1,4 @@
+import { catalogImage } from "@/lib/catalog-images";
 import * as React from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -49,6 +50,7 @@ export function BannersAdmin() {
       image: editing.image,
       cta_label: editing.cta_label ?? null,
       cta_link: editing.cta_link ?? null,
+      placement: "hero",
       active: editing.active ?? true,
       sort_order: Number(editing.sort_order ?? 0),
     };
@@ -88,7 +90,7 @@ export function BannersAdmin() {
         <div>
           <h2 className="font-display text-2xl font-bold">Banners</h2>
           <p className="text-sm text-muted-foreground">
-            The active banner with the lowest sort order is shown on the homepage hero.
+            Active hero slides appear on the home page in sort order.
           </p>
         </div>
         <Button
@@ -107,7 +109,7 @@ export function BannersAdmin() {
               <Input
                 value={editing.title ?? ""}
                 onChange={(e) => setEditing({ ...editing, title: e.target.value })}
-                placeholder="Discover Premium Timepieces"
+                placeholder="A little peace. Every day."
               />
             </div>
             <div>
@@ -115,7 +117,7 @@ export function BannersAdmin() {
               <Input
                 value={editing.eyebrow ?? ""}
                 onChange={(e) => setEditing({ ...editing, eyebrow: e.target.value })}
-                placeholder="Est. 2025 — Swiss Crafted"
+                placeholder="DAILY WORSHIP, BEAUTIFULLY CONSIDERED"
               />
             </div>
             <div>
@@ -194,7 +196,7 @@ export function BannersAdmin() {
           >
             {b.image && (
               <img
-                src={b.image}
+                src={catalogImage(b.image)}
                 alt=""
                 className="h-14 w-20 rounded bg-muted object-cover"
               />

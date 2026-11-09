@@ -1,7 +1,7 @@
 export const categories = [
   { slug: 'prayer-mats', name: 'Prayer Mats' }, { slug: 'tasbeeh', name: 'Tasbeeh' },
-  { slug: 'attar', name: 'Attar' }, { slug: 'prayer-wear', name: 'Prayer Wear' },
-  { slug: 'ihram', name: 'Ihram' }, { slug: 'quran', name: 'Quran & Accessories' },
+  { slug: 'attar', name: 'Attar' }, { slug: 'prayer-wear', name: "Women's Namaz Chaddar" },
+  { slug: 'ihram', name: 'Ahram / Ihram' }, { slug: 'quran', name: 'Quran & Accessories' },
   { slug: 'gift-boxes', name: 'Hadiya Gift Boxes' },
 ] as const;
 export type Category = string;

@@ -1,3 +1,4 @@
+import { pageHead, storeName } from "@/lib/brand";
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
@@ -12,20 +13,7 @@ import { useSiteSettings } from "@/hooks/use-settings";
 import { useAuth } from "@/context/AuthContext";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({
-    meta: [
-      { title: "Contact — Time & Trend" },
-      {
-        name: "description",
-        content: "Get in touch with the Time & Trend team. We'd love to hear from you.",
-      },
-      { property: "og:title", content: "Contact — Time & Trend" },
-      {
-        property: "og:description",
-        content: "Get in touch with the Time & Trend team.",
-      },
-    ],
-  }),
+  head: () => pageHead("Contact", "Contact Subhani Studio for product questions and order support in Pakistan."),
   component: ContactPage,
 });
 
@@ -79,18 +67,18 @@ function ContactPage() {
       toast.error("Failed to send message. Please try again.");
       return;
     }
-    toast.success("Message sent! We'll get back to you within 24 hours.");
+    toast.success("Message sent! Our team will get back to you.");
     form.reset();
   };
 
-  const email = settings?.contact_email ?? "timeandtrend000@gmail.com";
-  const phone = settings?.contact_phone ?? "+92 331 0006549";
-  const address = settings?.contact_address ?? "Karachi, Pakistan";
+  const email = settings?.contact_email ?? "Email — placeholder, not yet supplied";
+  const phone = settings?.contact_phone ?? "Phone — placeholder, not yet supplied";
+  const address = settings?.contact_address ?? "Karachi, Pakistan — address placeholder";
   const phoneDigits = phone.replace(/[^\d]/g, "");
 
   const contacts = [
-    { icon: Mail, label: email, href: `mailto:${email}` },
-    { icon: Phone, label: phone, href: `https://wa.me/${phoneDigits}` },
+    { icon: Mail, label: email, href: settings?.contact_email ? `mailto:${email}` : undefined },
+    { icon: Phone, label: phone, href: settings?.contact_phone ? `tel:+${phoneDigits}` : undefined },
     { icon: MapPin, label: address },
   ];
 
@@ -108,7 +96,7 @@ function ContactPage() {
             className="space-y-6"
           >
             <p className="text-muted-foreground">
-              Have a question about a piece, an order, or our craftsmanship? Our concierge team
+              Have a question about a prayer essential, a gift, or your order? Our support team
               is here to help.
             </p>
             {contacts.map((c) => {

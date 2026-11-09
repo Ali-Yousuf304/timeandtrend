@@ -110,7 +110,7 @@ export function CollectionsAdmin() {
           onDelete={setDeleting}
         />
         <CollectionList
-          title="By style"
+          title="By product series"
           kind="style"
           items={byKind("style")}
           counts={counts.style}

@@ -1,3 +1,4 @@
+import { pageHead, storeName } from "@/lib/brand";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useProducts } from "@/hooks/use-products";
@@ -5,20 +6,7 @@ import { useAllProductRatings } from "@/hooks/use-product-ratings";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/bestsellers")({
-  head: () => ({
-    meta: [
-      { title: "Best Sellers — Time & Trend" },
-      {
-        name: "description",
-        content: "Our most loved luxury timepieces, hand-picked by our customers.",
-      },
-      { property: "og:title", content: "Best Sellers — Time & Trend" },
-      {
-        property: "og:description",
-        content: "Our most loved luxury timepieces this season.",
-      },
-    ],
-  }),
+  head: () => pageHead("Featured Essentials", "Discover selected prayer essentials, attar and meaningful gifts."),
   component: BestSellersPage,
 });
 

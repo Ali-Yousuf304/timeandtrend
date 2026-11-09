@@ -1,3 +1,4 @@
+import { pageHead, storeName } from "@/lib/brand";
 import * as React from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useAuth } from "@/context/AuthContext";
@@ -21,12 +22,7 @@ export const Route = createFileRoute("/account")({
     }
     return {};
   },
-  head: () => ({
-    meta: [
-      { title: "My Account — Time & Trend" },
-      { name: "description", content: "Manage your profile, addresses, and orders." },
-    ],
-  }),
+  head: () => pageHead("My Account", "Manage your Subhani Studio profile, addresses, orders and reviews."),
   component: AccountPage,
 });
 

@@ -218,7 +218,7 @@ export function SettingsAdmin() {
                     id="store-name"
                     value={storeName}
                     onChange={(e) => setStoreName(e.target.value)}
-                    placeholder="Time & Trend"
+                    placeholder="Subhani Studio"
                   />
                 </div>
                 <div>

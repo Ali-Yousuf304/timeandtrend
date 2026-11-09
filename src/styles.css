@@ -6,7 +6,7 @@
 
 /*
  * Subhani Studio worship design system.
- * Palette: deep ink background, warm gold accent, off-white surfaces.
+ * Palette: emerald, ivory, soft gold and charcoal.
  */
 
 @theme inline {
@@ -39,6 +39,8 @@
   --color-gold-foreground: var(--gold-foreground);
   --color-ink: var(--ink);
   --color-ink-foreground: var(--ink-foreground);
+  --color-whatsapp: var(--whatsapp);
+  --color-whatsapp-foreground: var(--primary-foreground);
   --font-display: "Playfair Display", "Cormorant Garamond", serif;
   --font-sans: "DM Sans", system-ui, sans-serif;
 }
@@ -52,7 +54,7 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.01 80);
 
-  /* Primary = gold */
+  /* Primary = emerald */
   --primary: oklch(0.32 0.055 163);
   --primary-foreground: oklch(0.98 0.008 90);
 
@@ -71,8 +73,9 @@
   /* Brand tokens */
   --gold: oklch(0.78 0.12 85);
   --gold-foreground: oklch(0.18 0.01 80);
-  --ink: oklch(0.25 0.045 163);
+  --ink: oklch(0.23 0.008 160);
   --ink-foreground: oklch(0.98 0.003 90);
+  --whatsapp: oklch(0.56 0.15 151);
 }
 
 .dark {
@@ -82,7 +85,7 @@
   --card-foreground: oklch(0.98 0.003 90);
   --popover: oklch(0.2 0.01 270);
   --popover-foreground: oklch(0.98 0.003 90);
-  --primary: oklch(0.78 0.12 85);
+  --primary: oklch(0.7 0.075 163);
   --primary-foreground: oklch(0.16 0.01 270);
   --secondary: oklch(0.25 0.01 270);
   --secondary-foreground: oklch(0.98 0.003 90);
@@ -150,3 +153,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+
+@utility geometric-pattern {
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 23px, color-mix(in oklab, var(--gold) 12%, transparent) 23px, color-mix(in oklab, var(--gold) 12%, transparent) 24px), repeating-linear-gradient(-45deg, transparent, transparent 23px, color-mix(in oklab, var(--gold) 12%, transparent) 23px, color-mix(in oklab, var(--gold) 12%, transparent) 24px);
+}
