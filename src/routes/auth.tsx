@@ -1,3 +1,4 @@
+import { pageHead, storeName } from "@/lib/brand";
 import * as React from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useAuth } from "@/context/AuthContext";
@@ -5,20 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useSiteSettings } from "@/hooks/use-settings";
 import { sendEmail } from "@/lib/email";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({
-    meta: [
-      { title: "Sign in — Time & Trend" },
-      { name: "description", content: "Sign in or create an account at Time & Trend." },
-    ],
-  }),
+  head: () => pageHead("Sign In", "Sign in or create your Subhani Studio account."),
   component: AuthPage,
 });
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { settings } = useSiteSettings();
   const { user, signIn, signUp } = useAuth();
   const [mode, setMode] = React.useState<"signin" | "signup">("signin");
   const [email, setEmail] = React.useState("");
@@ -57,8 +55,8 @@ function AuthPage() {
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {mode === "signin"
-            ? "Welcome back to Time & Trend."
-            : "Join Time & Trend to track orders and save favorites."}
+            ? `Welcome back to ${storeName(settings)}.`
+            : `Join ${storeName(settings)} to track orders and save favorites.`}
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">

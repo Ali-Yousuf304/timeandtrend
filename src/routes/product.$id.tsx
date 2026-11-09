@@ -1,3 +1,4 @@
+import { pageHead } from "@/lib/brand";
 import * as React from "react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { Star, Heart, ShoppingCart, ArrowLeft } from "lucide-react";
@@ -16,6 +17,7 @@ import { cn } from "@/lib/utils";
 import type { Product } from "@/data/products";
 
 export const Route = createFileRoute("/product/$id")({
+  head: () => pageHead("Prayer Essentials & Gifts", "Explore Subhani Studio prayer essentials, product details and genuine customer reviews."),
   component: ProductPage,
   errorComponent: ({ error, reset }) => {
     const router = useRouter();
@@ -38,7 +40,7 @@ export const Route = createFileRoute("/product/$id")({
     <div className="mx-auto max-w-md py-20 text-center">
       <p className="text-muted-foreground">Product not found.</p>
       <Link to="/collections" className="mt-4 inline-block text-[var(--gold)] underline">
-        Browse all watches
+        Browse all essentials
       </Link>
     </div>
   ),
@@ -87,7 +89,7 @@ function ProductPage() {
           to="/collections"
           className="mt-4 inline-block text-[var(--gold)] underline"
         >
-          Browse all watches
+          Browse all essentials
         </Link>
       </div>
     );
@@ -172,7 +174,7 @@ function ProductPage() {
             <span className="text-sm text-muted-foreground">
               {rating.count > 0
                 ? `${rating.average.toFixed(1)} (${rating.count} review${rating.count === 1 ? "" : "s"})`
-                : "No reviews yet"}
+                : "Be the first to review"}
             </span>
           </div>
 
@@ -226,7 +228,7 @@ function ProductPage() {
           {settings?.whatsapp_number && settings.whatsapp_enabled !== false && (
             <a
               href={(() => {
-                const digits = settings.whatsapp_number!.replace(/[^\d]/g, "");
+                const digits = (settings.whatsapp_number ?? "").replace(/[^\d]/g, "");
                 const url = typeof window !== "undefined" ? window.location.href : "";
                 const text = `Hi! I'd like to order *${product.name}* (Rs. ${product.price.toLocaleString()}) — ${url}`;
                 return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`;

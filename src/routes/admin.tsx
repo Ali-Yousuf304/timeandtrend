@@ -1,3 +1,4 @@
+import { pageHead, storeName } from "@/lib/brand";
 import * as React from "react";
 import { createFileRoute, Outlet, useNavigate, Link, useLocation } from "@tanstack/react-router";
 import { useAuth } from "@/context/AuthContext";
@@ -8,12 +9,7 @@ import { useSiteSettings } from "@/hooks/use-settings";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({
-    meta: [
-      { title: "Admin — Time & Trend" },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
+  head: () => pageHead("Admin", "Manage Subhani Studio products, customers and orders."),
   component: AdminLayout,
 });
 
@@ -72,7 +68,7 @@ function AdminLayout() {
                 />
               ) : (
                 <span className="font-display text-lg font-bold tracking-tight">
-                  Time <span className="text-[var(--gold)]">&amp;</span> Trend
+                  {storeName(settings)}
                 </span>
               )}
               <span className="hidden text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground sm:inline">

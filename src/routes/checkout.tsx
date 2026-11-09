@@ -1,3 +1,4 @@
+import { pageHead, storeName } from "@/lib/brand";
 import * as React from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/context/AuthContext";
@@ -14,12 +15,7 @@ import { Tag, X } from "lucide-react";
 import { sendEmail, getAdminEmails } from "@/lib/email";
 
 export const Route = createFileRoute("/checkout")({
-  head: () => ({
-    meta: [
-      { title: "Checkout — Time & Trend" },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
+  head: () => pageHead("Checkout", "Complete your Subhani Studio order for delivery across Pakistan."),
   component: CheckoutPage,
 });
 

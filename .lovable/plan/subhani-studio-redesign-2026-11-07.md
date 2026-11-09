@@ -26,7 +26,7 @@ Transform the existing store into a calm, premium Islamic lifestyle shop for Pak
 - Set configurable delivery to Rs. 250 and free above Rs. 1,999.
 - Add editable announcement content to the existing banners administration and retain existing promotions controls.
 - Keep Karachi contact details visibly identified as placeholders. Do not invent bank accounts, support numbers or social accounts; leave those configurable until supplied.
-- Compute average ratings and total review counts only from real approved database reviews on cards, product pages and the home trust strip. Hide the stats strip when there are none and show "Be the first to review" for empty reviews. Never seed invented testimonials or customer claims; customer counts must use real order data or be removed.
+- Compute average ratings and total review counts only from real approved database reviews on cards, product pages and the home trust strip. Hide the stats strip and reviews carousel when there are none and show "Be the first to review" for empty reviews. Never seed invented testimonials or customer claims; customer counts must use real order data or be removed.
 
 ## Technical details
 - Extend existing product data with generic attributes, variants and availability; retain historical order items and customer data when replacing sample products.

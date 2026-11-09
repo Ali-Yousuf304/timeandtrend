@@ -1,3 +1,4 @@
+import { pageHead, storeName } from "@/lib/brand";
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
@@ -5,20 +6,7 @@ import { Star, MessageSquare } from "lucide-react";
 import { useAllReviews } from "@/hooks/use-reviews";
 
 export const Route = createFileRoute("/reviews")({
-  head: () => ({
-    meta: [
-      { title: "Reviews — Time & Trend" },
-      {
-        name: "description",
-        content: "Read what our customers say about their Time & Trend timepieces.",
-      },
-      { property: "og:title", content: "Reviews — Time & Trend" },
-      {
-        property: "og:description",
-        content: "Customer reviews of our luxury watches.",
-      },
-    ],
-  }),
+  head: () => pageHead("Customer Reviews", "Genuine customer reviews of our Islamic lifestyle essentials."),
   component: ReviewsPage,
 });
 
@@ -38,7 +26,7 @@ function ReviewsPage() {
           <div className="mt-6 rounded-lg border border-dashed border-border p-12 text-center">
             <MessageSquare className="mx-auto h-10 w-10 text-muted-foreground" />
             <p className="mt-3 text-muted-foreground">
-              No reviews yet. Be the first to review one of our timepieces!
+              No reviews yet. Be the first to review one of our prayer essentials!
             </p>
           </div>
         ) : (
