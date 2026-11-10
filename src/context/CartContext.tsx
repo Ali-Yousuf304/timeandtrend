@@ -1,4 +1,5 @@
 import * as React from "react";
+import { supabase } from "@/integrations/supabase/client";
 import type { Product } from "@/data/products";
 import { trackEvent } from "@/hooks/use-analytics";
 
@@ -25,27 +26,29 @@ const CartContext = React.createContext<CartContextValue | null>(null);
 const STORAGE_KEY = "tt_cart_items_v1";
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = React.useState<CartItem[]>(() => {
-    if (typeof window === "undefined") return [];
+  const [items, setItems] = React.useState<CartItem[]>([]);
+  const [restored, setRestored] = React.useState(false);
+  React.useEffect(() => {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? (parsed as CartItem[]) : [];
-    } catch {
-      return [];
-    }
-  });
+      const parsed = raw ? JSON.parse(raw) : [];
+      supabase.from('products').select('id').then(({ data }) => {
+        const valid = new Set((data ?? []).map(p => p.id));
+        setItems(Array.isArray(parsed) ? parsed.filter(i => valid.has(i?.product?.id)) : []);
+        setRestored(true);
+      });
+    } catch { setRestored(true); }
+  }, []);
   const [isOpen, setIsOpen] = React.useState(false);
 
   React.useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (!restored) return;
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     } catch {
       // ignore quota errors
     }
-  }, [items]);
+  }, [items, restored]);
 
   const add = React.useCallback((product: Product) => {
     setItems((prev) => {

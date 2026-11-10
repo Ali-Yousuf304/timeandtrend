@@ -12,7 +12,7 @@ const corsHeaders = {
 };
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const FROM = "Time & Trend <noreply@timeandtrend.store>";
+const FROM = "Subhani Studio <noreply@timeandtrend.store>";
 
 interface OrderItem {
   product_name: string;
@@ -38,12 +38,12 @@ function styledShell(inner: string) {
   return `<!doctype html><html><body style="font-family:Arial,Helvetica,sans-serif;background:#f6f6f6;margin:0;padding:24px;color:#1a1a1a;">
     <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
       <div style="background:#1a1a1a;padding:24px;text-align:center;">
-        <h1 style="color:#d4af37;margin:0;font-family:Georgia,serif;font-size:28px;">Time &amp; Trend</h1>
-        <p style="color:#ffffff;opacity:0.7;margin:6px 0 0;font-size:12px;letter-spacing:0.2em;">LUXURY ON YOUR WRIST</p>
+        <h1 style="color:#d4af37;margin:0;font-family:Georgia,serif;font-size:28px;">Subhani Studio</h1>
+        <p style="color:#ffffff;opacity:0.7;margin:6px 0 0;font-size:12px;letter-spacing:0.2em;">FAITH-INSPIRED ESSENTIALS</p>
       </div>
       <div style="padding:32px 28px;">${inner}</div>
       <div style="background:#fafafa;padding:18px;text-align:center;font-size:11px;color:#888;">
-        © ${new Date().getFullYear()} Time &amp; Trend. All rights reserved.
+        © ${new Date().getFullYear()} Subhani Studio. All rights reserved.
       </div>
     </div>
   </body></html>`;
@@ -89,7 +89,7 @@ function orderConfirmationHtml(d: OrderData) {
 function welcomeHtml(name: string) {
   return styledShell(`
     <h2 style="margin:0 0 12px;font-size:22px;">Welcome, ${name}! 👋</h2>
-    <p style="color:#555;line-height:1.6;">Thank you for joining <strong>Time &amp; Trend</strong>. You're now part of a community that values timeless design and craftsmanship.</p>
+    <p style="color:#555;line-height:1.6;">Thank you for joining <strong>Subhani Studio</strong>. You're now part of a community that values peace, comfort and quality in daily worship.</p>
     <p style="color:#555;line-height:1.6;">Browse our latest collections, save your favorites to your wishlist, and enjoy free shipping on orders above the threshold.</p>
     <div style="text-align:center;margin:28px 0;">
       <a href="https://timeandtrend.store/collections" style="display:inline-block;background:#d4af37;color:#1a1a1a;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;">Start Shopping</a>
@@ -155,11 +155,11 @@ serve(async (req) => {
         html = orderConfirmationHtml(data as OrderData);
         break;
       case "welcome":
-        subject = "Welcome to Time & Trend";
+        subject = "Welcome to Subhani Studio";
         html = welcomeHtml(data?.name ?? "Friend");
         break;
       case "password_reset":
-        subject = "Reset your Time & Trend password";
+        subject = "Reset your Subhani Studio password";
         html = passwordResetHtml(data?.link ?? "#");
         break;
       case "admin_new_order":

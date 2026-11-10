@@ -43,6 +43,8 @@ interface Collection {
   kind: Kind;
   sort_order: number;
   active: boolean;
+  image: string;
+  show_in_navbar: boolean;
 }
 
 function slugify(s: string) {
@@ -282,6 +284,8 @@ function CollectionDialog({
   const [k, setK] = React.useState<Kind>(kind);
   const [sortOrder, setSortOrder] = React.useState("0");
   const [active, setActive] = React.useState(true);
+  const [image, setImage] = React.useState('');
+  const [showInNavbar, setShowInNavbar] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
 
   React.useEffect(() => {
@@ -291,6 +295,8 @@ function CollectionDialog({
       setK(initial?.kind ?? kind);
       setSortOrder(String(initial?.sort_order ?? 0));
       setActive(initial?.active ?? true);
+      setImage(initial?.image ?? '');
+      setShowInNavbar(initial?.show_in_navbar ?? true);
       setSlugTouched(!!initial);
     }
   }, [open, initial, kind]);
@@ -311,6 +317,8 @@ function CollectionDialog({
       kind: k,
       sort_order: Number(sortOrder) || 0,
       active,
+      image: image.trim(),
+      show_in_navbar: showInNavbar,
     };
     const { error } = initial
       ? await supabase.from("collections").update(payload).eq("id", initial.id)
@@ -342,7 +350,7 @@ function CollectionDialog({
               id="c-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Luxury Pret"
+              placeholder="e.g. Prayer Mats"
             />
           </div>
           <div>
@@ -354,12 +362,14 @@ function CollectionDialog({
                 setSlugTouched(true);
                 setSlug(e.target.value);
               }}
-              placeholder="e.g. luxury-pret"
+              placeholder="e.g. prayer-mats"
             />
             <p className="mt-1 text-xs text-muted-foreground">
               Lowercase, hyphenated. Must match the product {k} value.
             </p>
           </div>
+          <div><Label htmlFor="c-image">Collection image URL or catalog key</Label><Input id="c-image" value={image} onChange={e => setImage(e.target.value)} placeholder="catalog:prayer-mat" /></div>
+          <div className="flex items-center justify-between"><Label htmlFor="c-navbar">Show in navbar</Label><Switch id="c-navbar" checked={showInNavbar} onCheckedChange={setShowInNavbar} /></div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label htmlFor="c-kind">Type</Label>

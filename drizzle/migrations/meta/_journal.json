@@ -8,6 +8,13 @@
       "when": 1794069132200,
       "tag": "0000_noor_sajdah_catalog_attributes",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794317305034,
+      "tag": "0001_collections_navigation_and_newsletter",
+      "breakpoints": true
     }
   ]
 }

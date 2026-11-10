@@ -97,8 +97,10 @@ export type Database = {
           active: boolean
           created_at: string
           id: string
+          image: string
           kind: string
           name: string
+          show_in_navbar: boolean
           slug: string
           sort_order: number
           updated_at: string
@@ -107,8 +109,10 @@ export type Database = {
           active?: boolean
           created_at?: string
           id?: string
+          image?: string
           kind?: string
           name: string
+          show_in_navbar?: boolean
           slug: string
           sort_order?: number
           updated_at?: string
@@ -117,8 +121,10 @@ export type Database = {
           active?: boolean
           created_at?: string
           id?: string
+          image?: string
           kind?: string
           name?: string
+          show_in_navbar?: boolean
           slug?: string
           sort_order?: number
           updated_at?: string
@@ -235,6 +241,24 @@ export type Database = {
           updated_at?: string
           usage_count?: number
           usage_limit?: number | null
+        }
+        Relationships: []
+      }
+      newsletter_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
         }
         Relationships: []
       }
