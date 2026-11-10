@@ -1,4 +1,5 @@
-import { categories, type ProductVariant, type ProductSpec } from "@/data/products";
+import { type ProductVariant, type ProductSpec } from "@/data/products";
+import { useCollections } from '@/hooks/use-collections';
 import { catalogImage } from "@/lib/catalog-images";
 import * as React from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -42,6 +43,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const MAX_IMAGES = 5;
 
 export function ProductsAdmin() {
+  const { collections: categories } = useCollections();
   const [items, setItems] = React.useState<DbProduct[]>([]);
   const [editing, setEditing] = React.useState<Partial<DbProduct> | null>(null);
   const [uploading, setUploading] = React.useState(false);

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useProducts } from '@/hooks/use-products';
-import { categories } from '@/data/products';
+import { useCollections } from '@/hooks/use-collections';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ProductCard } from './ProductCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 export function Catalog({ initialCategory = 'all', title = 'The essentials collection' }: { initialCategory?: string; title?: string }) {
  const { products, loading } = useProducts(); const [category,setCategory] = useState(initialCategory);
+ const { collections: categories, loading: collectionsLoading } = useCollections();
  const [sort,setSort] = useState('newest'); const [max,setMax] = useState(''); const [color,setColor] = useState('all'); const [size,setSize] = useState('all'); const [availability,setAvailability] = useState('all');
  const colors = [...new Set(products.flatMap((p) => p.variants.map((v) => v.color).filter((v): v is string => !!v)))];
  const sizes = [...new Set(products.flatMap((p) => p.variants.map((v) => v.size).filter((v): v is string => !!v)))];

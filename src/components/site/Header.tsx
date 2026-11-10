@@ -9,12 +9,14 @@ import { ThemeToggle } from './ThemeToggle';
 import { useSiteSettings } from '@/hooks/use-settings';
 import { Button } from '@/components/ui/button';
 import { storeName } from '@/lib/brand';
-import { categories } from '@/data/products';
+import { useCollections } from '@/hooks/use-collections';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function Header() {
   const { count, open } = useCart(); const { ids } = useWishlist();
   const { settings } = useSiteSettings(); const { pathname } = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { navbarCollections: categories, loading } = useCollections();
   if (pathname.startsWith('/admin')) return null;
   return <header className="sticky top-0 z-40 border-b border-border bg-background">
     <div className="mx-auto flex h-20 max-w-[1400px] items-center justify-between gap-3 px-4 md:px-8">
@@ -32,9 +34,9 @@ export function Header() {
     </div>
     <nav className="hidden border-t border-border/60 lg:block"><div className="mx-auto flex h-12 max-w-[1400px] items-center justify-center gap-7 px-8 text-xs font-medium">
       <Link to="/shop" className="text-primary">Shop All</Link>
-      {categories.map((c) => <Link key={c.slug} to="/shop" search={{ category: c.slug }} className="transition-colors hover:text-gold">{c.name}</Link>)}
+      {loading ? <Skeleton className="h-4 w-96" /> : categories.map((c) => <Link key={c.slug} to="/shop" search={{ category: c.slug }} className="transition-colors hover:text-gold">{c.name}</Link>)}
       <Link to="/about" className="text-muted-foreground">Our Story</Link>
     </div></nav>
-    {mobileOpen && <div className="max-h-[70vh] overflow-y-auto border-t border-border p-4 lg:hidden"><SearchBar onNavigate={() => setMobileOpen(false)} /><nav className="mt-4 grid grid-cols-2 gap-4 text-sm"><Link to="/shop" onClick={() => setMobileOpen(false)}>Shop All</Link>{categories.map((c) => <Link key={c.slug} to="/shop" search={{ category: c.slug }} onClick={() => setMobileOpen(false)}>{c.name}</Link>)}<Link to="/wishlist" onClick={() => setMobileOpen(false)}>Wishlist</Link><Link to="/contact" onClick={() => setMobileOpen(false)}>Contact</Link></nav></div>}
+    {mobileOpen && <div className="max-h-[70vh] overflow-y-auto border-t border-border p-4 lg:hidden"><SearchBar onNavigate={() => setMobileOpen(false)} /><nav className="mt-4 grid grid-cols-2 gap-4 text-sm"><Link to="/shop" onClick={() => setMobileOpen(false)}>Shop All</Link>{loading ? <Skeleton className="h-10 w-full" /> : categories.map((c) => <Link key={c.slug} to="/shop" search={{ category: c.slug }} onClick={() => setMobileOpen(false)}>{c.name}</Link>)}<Link to="/about" onClick={() => setMobileOpen(false)}>Our Story</Link></nav></div>}
   </header>;
 }
