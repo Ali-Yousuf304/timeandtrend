@@ -18,6 +18,7 @@ interface DbBanner {
   cta_label: string | null;
   cta_link: string | null;
   active: boolean;
+  placement: string;
   sort_order: number;
 }
 
@@ -39,7 +40,7 @@ export function BannersAdmin() {
 
   async function save() {
     if (!editing) return;
-    if (!editing.title || !editing.image) {
+    if (!editing.title || (editing.placement !== 'announcement' && !editing.image)) {
       toast.error("Title and image are required");
       return;
     }
@@ -47,10 +48,10 @@ export function BannersAdmin() {
       title: editing.title,
       subtitle: editing.subtitle ?? null,
       eyebrow: editing.eyebrow ?? null,
-      image: editing.image,
+      image: editing.image ?? "",
       cta_label: editing.cta_label ?? null,
       cta_link: editing.cta_link ?? null,
-      placement: "hero",
+      placement: editing.placement ?? "hero",
       active: editing.active ?? true,
       sort_order: Number(editing.sort_order ?? 0),
     };
@@ -113,7 +114,7 @@ export function BannersAdmin() {
               />
             </div>
             <div>
-              <Label>Eyebrow</Label>
+              <Label>Placement</Label><select aria-label="Banner placement" value={editing.placement ?? "hero"} onChange={e => setEditing({...editing,placement:e.target.value})} className="mb-3 block w-full rounded-md border border-border bg-background p-2"><option value="hero">Hero slide</option><option value="announcement">Announcement bar</option></select><Label>Eyebrow</Label>
               <Input
                 value={editing.eyebrow ?? ""}
                 onChange={(e) => setEditing({ ...editing, eyebrow: e.target.value })}
