@@ -52,7 +52,7 @@ export function ProductsAdmin() {
       .from("products")
       .select("*")
       .order("created_at", { ascending: false });
-    if (data) setItems(data as DbProduct[]);
+    if (data) setItems(data.map(row => ({ ...row, specs: Array.isArray(row.specs) ? row.specs.filter((s): s is { label: string; value: string } => !!s && typeof s === 'object' && !Array.isArray(s) && typeof s.label === 'string' && typeof s.value === 'string') : [], variants: Array.isArray(row.variants) ? row.variants.filter((v): v is { name: string; stock: number } => !!v && typeof v === 'object' && !Array.isArray(v) && typeof v.name === 'string' && typeof v.stock === 'number') : [] })));
   }, []);
 
   React.useEffect(() => {
@@ -149,8 +149,8 @@ export function ProductsAdmin() {
       availability: editing.availability ?? "in_stock",
       material: editing.material ?? null,
       care: editing.care ?? null,
-      variants: editing.variants ?? [],
-      specs: editing.specs ?? [],
+      variants: (editing.variants ?? []).map(v => ({ ...v })),
+      specs: (editing.specs ?? []).map(s => ({ ...s })),
       description: editing.description ?? "",
     };
     const { error } = editing.id
