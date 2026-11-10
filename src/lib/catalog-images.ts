@@ -17,5 +17,8 @@ import travel from '@/assets/catalog/travel-prayer-mat.jpg';
 import oud from '@/assets/catalog/oud-attar.jpg';
 import stone from '@/assets/catalog/stone-tasbeeh.jpg';
 import rehal from '@/assets/catalog/quran-rehal.jpg';
-const images: Record<string, string> = { 'prayer-mat': prayerMat, tasbeeh, attar, 'prayer-dress': prayerDress, ihram, quran, 'gift-box': gifts, 'prayer-mat-red': redMat, 'prayer-hero': prayerHero, 'gifts-hero': giftsHero, 'ihram-hero': ihramHero, 'travel-prayer-mat': travel, 'oud-attar': oud, 'stone-tasbeeh': stone, 'quran-rehal': rehal, 'kids-prayer-mat': kidsMat, 'velvet-prayer-mat': velvetMat, 'padded-prayer-mat': paddedMat, 'rose-namaz-chaddar': roseChaddar };
+import digital from '@/assets/catalog/digital-tasbeeh.jpg';
+import roseAttar from '@/assets/catalog/rose-attar.jpg';
+import umrahKit from '@/assets/catalog/umrah-kit.jpg';
+const images: Record<string, string> = { 'digital-tasbeeh': digital, 'rose-attar': roseAttar, 'umrah-kit': umrahKit, 'prayer-mat': prayerMat, tasbeeh, attar, 'prayer-dress': prayerDress, ihram, quran, 'gift-box': gifts, 'prayer-mat-red': redMat, 'prayer-hero': prayerHero, 'gifts-hero': giftsHero, 'ihram-hero': ihramHero, 'travel-prayer-mat': travel, 'oud-attar': oud, 'stone-tasbeeh': stone, 'quran-rehal': rehal, 'kids-prayer-mat': kidsMat, 'velvet-prayer-mat': velvetMat, 'padded-prayer-mat': paddedMat, 'rose-namaz-chaddar': roseChaddar };
 export function catalogImage(value: string) { return value.startsWith('catalog:') ? images[value.slice(8)] ?? prayerMat : value; }
