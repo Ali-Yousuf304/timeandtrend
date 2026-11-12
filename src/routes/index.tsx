@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ArrowRight, ArrowLeft, Truck, ShieldCheck, Gift, Flower2 } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Truck, ShieldCheck, Gift, Flower2, MapPin, MessageCircle } from 'lucide-react';
 import prayerHero from '@/assets/prayer-hero.jpg';
 import giftsHero from '@/assets/gifts-hero.jpg';
 import ihramHero from '@/assets/ihram-hero.jpg';
@@ -15,12 +15,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Rating } from '@/components/site/Rating';
 import { pageHead, storeName } from '@/lib/brand';
 import { approvedReviewStats } from '@/lib/review-stats';
+import { Newsletter } from '@/components/site/Newsletter';
 
 export const Route = createFileRoute('/')({ head: () => pageHead('Islamic Lifestyle & Daily Worship', 'Prayer mats, tasbeeh, attar, prayer wear, Ihram and meaningful gifts for daily worship. Shop Subhani Studio across Pakistan.'), component: HomePage });
 const fallbackSlides = [
   { title: 'A little peace.\nEvery day.', subtitle: 'Thoughtfully chosen essentials for your prayer, your home, and the people you cherish.', eyebrow: 'MADE FOR MEANINGFUL MOMENTS', image: prayerHero, cta_label: 'Shop Now', cta_link: '/shop' },
   { title: 'A gift with\nbeautiful intention.', subtitle: 'Share something meaningful with our carefully curated Hadiya gift boxes.', eyebrow: 'GIVE WITH LOVE', image: giftsHero, cta_label: 'Shop Now', cta_link: '/gift-boxes' },
-  { title: 'For a journey\nclose to the heart.', subtitle: 'Simple, considered Ihram essentials for your sacred journey.', eyebrow: 'YOUR UMRAH & HAJJ ESSENTIALS', image: ihramHero, cta_label: 'Shop Now', cta_link: '/shop?category=ihram' },
+  { title: 'For a journey\nclose to the heart.', subtitle: 'Simple, considered Ahram essentials for your sacred journey.', eyebrow: 'YOUR UMRAH & HAJJ ESSENTIALS', image: ihramHero, cta_label: 'Shop Now', cta_link: '/shop?category=ahram' },
 ];
 function HomePage() {
   const { products, loading } = useProducts(); const { settings } = useSiteSettings();
@@ -41,12 +42,14 @@ function HomePage() {
     <section className="geometric-pattern mx-auto max-w-[1320px] px-4 py-12 md:px-8"><div className="mb-8 text-center"><p className="text-[10px] font-semibold text-muted-foreground">EVERYDAY WORSHIP, BEAUTIFULLY CONSIDERED</p><h2 className="mt-2 font-display text-3xl">Find your essentials</h2></div><div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">{categories.map((c) => <Link key={c.slug} to="/shop" search={{ category:c.slug }} className="group text-center"><div className="aspect-square overflow-hidden rounded-md bg-muted"><img src={c.image} alt={c.name} loading="lazy" width={200} height={200} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" /></div><p className="mt-3 text-xs font-medium">{c.name}</p></Link>)}</div></section>
     {row('Kids Series Prayer Mats','LITTLE STEPS, BEAUTIFUL BEGINNINGS','prayer-mats','kids-series')}
     {row('Velvet & Padded Prayer Mats','COMFORT IN EVERY SAJDAH','prayer-mats','velvet-padded')}
-    {row('Premium Attar','THE FRAGRANCE EDIT','attar')}
+    {row('Premium Attar Collection','THE FRAGRANCE EDIT','attar')}
     <section className="relative h-96 overflow-hidden"><img src={giftsHero} alt="Hadiya gift box with attar and tasbeeh" loading="lazy" width={1536} height={1024} className="absolute h-full w-full object-cover" /><div className="relative mx-auto flex h-full max-w-[1320px] items-center px-6 md:px-10"><div className="max-w-xs"><p className="text-xs text-ink">A BEAUTIFUL WAY TO SAY YOU CARE</p><h2 className="mt-3 font-display text-4xl text-ink">Hadiya, from<br />the heart.</h2><p className="mt-4 text-sm text-ink/80">Meaningful gifts for the moments and people that matter.</p><Button asChild className="mt-6"><Link to="/gift-boxes">Explore gift boxes <ArrowRight className="h-4 w-4" /></Link></Button></div></div></section>
     {row("Women's Namaz Chaddar",'MODESTY & EVERYDAY COMFORT','namaz-chaddar')}
     {row('Hadiya Gift Boxes','GIVE WITH BEAUTIFUL INTENTION','gift-boxes')}
     {stats.count > 0 && <section className="border-y border-border bg-secondary py-8 text-center" aria-label="Customer review statistics"><p className="font-display text-2xl">Thoughts from our community</p><div className="mt-3 flex justify-center"><Rating {...stats} /></div></section>}
     {reviews.length > 0 && <section className="mx-auto max-w-[1320px] px-4 py-14 md:px-8"><div className="mb-7 flex items-center justify-between"><h2 className="font-display text-3xl">Your words, our gratitude</h2><Button variant="link" asChild><Link to="/reviews">All reviews <ArrowRight className="h-4 w-4" /></Link></Button></div>{reviews.length ? <div className="flex gap-6 overflow-x-auto pb-4">{reviews.slice(0,6).map((r) => <article key={r.id} className="min-w-64 flex-1 rounded-md border border-border p-6"><Rating average={r.rating} count={1} />{r.title && <h3 className="mt-3 text-lg">{r.title}</h3>}<p className="mt-3 text-sm text-muted-foreground">{r.body}</p><p className="mt-4 text-xs text-muted-foreground">{products.find((p) => p.id === r.product_id)?.name ?? 'Customer review'}</p></article>)}</div> : <div className="border-y border-border py-10 text-center"><Flower2 className="mx-auto h-8 w-8 text-gold" /><p className="mt-4 font-display text-xl">Be the first to review</p><p className="mt-2 text-sm text-muted-foreground">Your experience means a lot to us.</p></div>}</section>}
     <section className="geometric-pattern bg-ink py-16 text-ink-foreground"><div className="mx-auto max-w-2xl px-6 text-center"><Flower2 className="mx-auto h-8 w-8 text-gold" /><h2 className="mt-5 font-display text-3xl">Why choose {storeName(settings)}?</h2><div className="mt-6 grid grid-cols-3 gap-4 text-xs"><span>Considered quality</span><span>Comfort for daily worship</span><span>Meaningful gifting</span></div><p className="mt-5 text-sm leading-relaxed text-ink-foreground/75">At {storeName(settings)}, we believe that the simplest things can bring us closer to what matters. Our prayer essentials and meaningful gifts bring a little more peace, comfort and intention to your everyday worship.</p><Button variant="link" asChild className="mt-5 text-gold"><Link to="/about">Our story <ArrowRight className="h-4 w-4" /></Link></Button></div></section>
+    <section className="mx-auto grid max-w-[1320px] gap-8 px-6 py-12 md:grid-cols-2 md:px-8"><div><p className="text-xs font-semibold text-primary">VISIT OR GET IN TOUCH</p><h2 className="mt-2 font-display text-3xl">Here for your questions.</h2><p className="mt-3 text-sm text-muted-foreground">For help choosing an essential or checking an order, reach our team through the details below.</p><p className="mt-5 flex items-center gap-2 text-sm"><MapPin className="h-4 w-4 text-primary" />{settings?.contact_address || 'Karachi, Pakistan — address placeholder'}</p><p className="mt-2 text-sm text-muted-foreground">{settings?.contact_phone || 'WhatsApp — phone placeholder, not yet supplied'}</p><Button asChild variant="outline" className="mt-5"><Link to="/contact"><MessageCircle className="mr-2 h-4 w-4" />Contact us</Link></Button></div><div className="flex items-center justify-center border-y border-border py-8 text-center md:border-y-0 md:border-l"><div><p className="font-display text-3xl">Thoughtful things for everyday worship.</p><p className="mt-2 text-xs text-muted-foreground">Prayer essentials and meaningful gifts, chosen with care.</p></div></div></section>
+    <Newsletter />
   </>;
 }
