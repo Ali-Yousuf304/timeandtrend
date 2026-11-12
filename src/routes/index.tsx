@@ -5,6 +5,7 @@ import prayerHero from '@/assets/prayer-hero.jpg';
 import giftsHero from '@/assets/gifts-hero.jpg';
 import ihramHero from '@/assets/ihram-hero.jpg';
 import { useProducts } from '@/hooks/use-products';
+import { useCollections } from '@/hooks/use-collections';
 import { useApprovedReviews } from '@/hooks/use-product-ratings';
 import { useSiteSettings } from '@/hooks/use-settings';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,8 +13,6 @@ import { ProductCard } from '@/components/site/ProductCard';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Rating } from '@/components/site/Rating';
-import { categories } from '@/data/products';
-import { catalogImage } from '@/lib/catalog-images';
 import { pageHead, storeName } from '@/lib/brand';
 import { approvedReviewStats } from '@/lib/review-stats';
 
@@ -25,6 +24,7 @@ const fallbackSlides = [
 ];
 function HomePage() {
   const { products, loading } = useProducts(); const { settings } = useSiteSettings();
+  const { collections: categories } = useCollections();
   const { data: reviews = [] } = useApprovedReviews(); const stats = approvedReviewStats(reviews);
   const [slides, setSlides] = useState(fallbackSlides); const [active, setActive] = useState(0);
   useEffect(() => { supabase.from('banners').select('*').eq('active',true).eq('placement','hero').order('sort_order').then(({ data }) => { if (data?.length) setSlides(data.map((b) => ({ title: b.title, subtitle: b.subtitle ?? '', eyebrow: b.eyebrow ?? '', image: catalogImage(b.image), cta_label: b.cta_label ?? 'Shop now', cta_link: b.cta_link ?? '/shop' }))); }); }, []);
@@ -38,12 +38,12 @@ function HomePage() {
       <div className="absolute bottom-5 left-6 right-6 flex items-center justify-between md:left-10 md:right-10"><span className="text-sm font-display text-ink">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span><div className="flex gap-2"><Button variant="outline" size="icon" aria-label="Previous slide" className="rounded-full bg-background/70" onClick={() => setActive((active+slides.length-1)%slides.length)}><ArrowLeft className="h-4 w-4" /></Button><Button variant="outline" size="icon" aria-label="Next slide" className="rounded-full bg-background/70" onClick={() => setActive((active+1)%slides.length)}><ArrowRight className="h-4 w-4" /></Button></div></div>
     </section>
     <div className="border-b border-border bg-background"><div className="mx-auto grid max-w-[1320px] grid-cols-2 gap-4 px-4 py-5 text-xs md:grid-cols-4 md:px-8"><span className="flex items-center justify-center gap-2"><Truck className="h-4 w-4 text-primary" />Delivery across Pakistan</span><span className="flex items-center justify-center gap-2"><ShieldCheck className="h-4 w-4 text-primary" />Cash on Delivery</span><span className="flex items-center justify-center gap-2"><Gift className="h-4 w-4 text-primary" />Thoughtful gifting</span><span className="flex items-center justify-center gap-2"><Flower2 className="h-4 w-4 text-primary" />Chosen with care</span></div></div>
-    <section className="mx-auto max-w-[1320px] px-4 py-12 md:px-8"><div className="mb-8 text-center"><p className="text-[10px] font-semibold text-muted-foreground">EVERYDAY WORSHIP, BEAUTIFULLY CONSIDERED</p><h2 className="mt-2 font-display text-3xl">Find your essentials</h2></div><div className="grid grid-cols-3 gap-4 md:grid-cols-7">{categories.map((c,i) => <Link key={c.slug} to="/shop" search={{ category:c.slug }} className="group text-center"><div className="aspect-square overflow-hidden rounded-full bg-muted"><img src={catalogImage('catalog:'+['prayer-mat','tasbeeh','attar','prayer-dress','ihram','quran','gift-box'][i])} alt={c.name} loading="lazy" width={200} height={200} className="h-full w-full object-cover transition-transform group-hover:scale-105" /></div><p className="mt-3 text-xs font-medium">{c.name}</p></Link>)}</div></section>
+    <section className="geometric-pattern mx-auto max-w-[1320px] px-4 py-12 md:px-8"><div className="mb-8 text-center"><p className="text-[10px] font-semibold text-muted-foreground">EVERYDAY WORSHIP, BEAUTIFULLY CONSIDERED</p><h2 className="mt-2 font-display text-3xl">Find your essentials</h2></div><div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">{categories.map((c) => <Link key={c.slug} to="/shop" search={{ category:c.slug }} className="group text-center"><div className="aspect-square overflow-hidden rounded-md bg-muted"><img src={c.image} alt={c.name} loading="lazy" width={200} height={200} className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" /></div><p className="mt-3 text-xs font-medium">{c.name}</p></Link>)}</div></section>
     {row('Kids Series Prayer Mats','LITTLE STEPS, BEAUTIFUL BEGINNINGS','prayer-mats','kids-series')}
     {row('Velvet & Padded Prayer Mats','COMFORT IN EVERY SAJDAH','prayer-mats','velvet-padded')}
     {row('Premium Attar','THE FRAGRANCE EDIT','attar')}
     <section className="relative h-96 overflow-hidden"><img src={giftsHero} alt="Hadiya gift box with attar and tasbeeh" loading="lazy" width={1536} height={1024} className="absolute h-full w-full object-cover" /><div className="relative mx-auto flex h-full max-w-[1320px] items-center px-6 md:px-10"><div className="max-w-xs"><p className="text-xs text-ink">A BEAUTIFUL WAY TO SAY YOU CARE</p><h2 className="mt-3 font-display text-4xl text-ink">Hadiya, from<br />the heart.</h2><p className="mt-4 text-sm text-ink/80">Meaningful gifts for the moments and people that matter.</p><Button asChild className="mt-6"><Link to="/gift-boxes">Explore gift boxes <ArrowRight className="h-4 w-4" /></Link></Button></div></div></section>
-    {row("Women's Namaz Chaddar",'MODESTY & EVERYDAY COMFORT','prayer-wear')}
+    {row("Women's Namaz Chaddar",'MODESTY & EVERYDAY COMFORT','namaz-chaddar')}
     {row('Hadiya Gift Boxes','GIVE WITH BEAUTIFUL INTENTION','gift-boxes')}
     {stats.count > 0 && <section className="border-y border-border bg-secondary py-8 text-center" aria-label="Customer review statistics"><p className="font-display text-2xl">Thoughts from our community</p><div className="mt-3 flex justify-center"><Rating {...stats} /></div></section>}
     {reviews.length > 0 && <section className="mx-auto max-w-[1320px] px-4 py-14 md:px-8"><div className="mb-7 flex items-center justify-between"><h2 className="font-display text-3xl">Your words, our gratitude</h2><Button variant="link" asChild><Link to="/reviews">All reviews <ArrowRight className="h-4 w-4" /></Link></Button></div>{reviews.length ? <div className="flex gap-6 overflow-x-auto pb-4">{reviews.slice(0,6).map((r) => <article key={r.id} className="min-w-64 flex-1 rounded-md border border-border p-6"><Rating average={r.rating} count={1} />{r.title && <h3 className="mt-3 text-lg">{r.title}</h3>}<p className="mt-3 text-sm text-muted-foreground">{r.body}</p><p className="mt-4 text-xs text-muted-foreground">{products.find((p) => p.id === r.product_id)?.name ?? 'Customer review'}</p></article>)}</div> : <div className="border-y border-border py-10 text-center"><Flower2 className="mx-auto h-8 w-8 text-gold" /><p className="mt-4 font-display text-xl">Be the first to review</p><p className="mt-2 text-sm text-muted-foreground">Your experience means a lot to us.</p></div>}</section>}
