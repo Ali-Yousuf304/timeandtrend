@@ -21,6 +21,7 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as CancellationPolicyRouteImport } from './routes/cancellation-policy'
 import { Route as BestsellersRouteImport } from './routes/bestsellers'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -97,6 +98,11 @@ const CollectionsRoute = CollectionsRouteImport.update({
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CancellationPolicyRoute = CancellationPolicyRouteImport.update({
+  id: '/cancellation-policy',
+  path: '/cancellation-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BestsellersRoute = BestsellersRouteImport.update({
@@ -192,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/bestsellers': typeof BestsellersRoute
+  '/cancellation-policy': typeof CancellationPolicyRoute
   '/checkout': typeof CheckoutRoute
   '/collections': typeof CollectionsRoute
   '/contact': typeof ContactRoute
@@ -222,6 +229,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountRoute
   '/auth': typeof AuthRoute
   '/bestsellers': typeof BestsellersRoute
+  '/cancellation-policy': typeof CancellationPolicyRoute
   '/checkout': typeof CheckoutRoute
   '/collections': typeof CollectionsRoute
   '/contact': typeof ContactRoute
@@ -254,6 +262,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/bestsellers': typeof BestsellersRoute
+  '/cancellation-policy': typeof CancellationPolicyRoute
   '/checkout': typeof CheckoutRoute
   '/collections': typeof CollectionsRoute
   '/contact': typeof ContactRoute
@@ -287,6 +296,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/bestsellers'
+    | '/cancellation-policy'
     | '/checkout'
     | '/collections'
     | '/contact'
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/auth'
     | '/bestsellers'
+    | '/cancellation-policy'
     | '/checkout'
     | '/collections'
     | '/contact'
@@ -348,6 +359,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/bestsellers'
+    | '/cancellation-policy'
     | '/checkout'
     | '/collections'
     | '/contact'
@@ -380,6 +392,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   BestsellersRoute: typeof BestsellersRoute
+  CancellationPolicyRoute: typeof CancellationPolicyRoute
   CheckoutRoute: typeof CheckoutRoute
   CollectionsRoute: typeof CollectionsRoute
   ContactRoute: typeof ContactRoute
@@ -479,6 +492,13 @@ declare module '@tanstack/react-router' {
       path: '/checkout'
       fullPath: '/checkout'
       preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cancellation-policy': {
+      id: '/cancellation-policy'
+      path: '/cancellation-policy'
+      fullPath: '/cancellation-policy'
+      preLoaderRoute: typeof CancellationPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bestsellers': {
@@ -638,6 +658,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   BestsellersRoute: BestsellersRoute,
+  CancellationPolicyRoute: CancellationPolicyRoute,
   CheckoutRoute: CheckoutRoute,
   CollectionsRoute: CollectionsRoute,
   ContactRoute: ContactRoute,
